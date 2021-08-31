@@ -72,5 +72,259 @@ namespace WSProcesSa.Controllers
                 return StatusCode(500, response);
             }
         }
+
+        [HttpPost]
+        [Route("add")]
+        public ActionResult AddRol([FromBody]Rol newRolToAdd)
+        {
+            using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+            {
+                try
+                {
+                    List<Error> errors = new List<Error>();
+                    if (!db.Rols.Any(rol => rol.IdRol == newRolToAdd.IdRol))
+                    {
+                        if (newRolToAdd.IdRol < 0)
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'IdRol'",
+                                Detail = "The Field 'IdRol' cannot be less 0"
+                            });
+                        }
+
+                        if (string.IsNullOrWhiteSpace(newRolToAdd.NombreRol))
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'NombreRol'",
+                                Detail = "The field 'NombreRol' can't be null or white space"
+                            });
+                        }
+
+                        if (string.IsNullOrWhiteSpace(newRolToAdd.DescripcionRol))
+                        {
+                            newRolToAdd.DescripcionRol = string.Empty;
+                        }
+
+                        if (errors.Count == 0)
+                        {
+                            Rol rolToAdd = new Rol()
+                            {
+                                NombreRol = newRolToAdd.NombreRol,
+                                DescripcionRol = newRolToAdd.DescripcionRol,
+                            };
+
+                            db.Rols.Add(rolToAdd);
+                            db.SaveChanges();
+                            return Created($"/detail/{newRolToAdd.IdRol}", new Response()
+                            {
+                                Data = new RolDTO(rolToAdd)
+                            });
+                        }
+                        else {
+                            Response response = new Response();
+                            response.Errors.Add(new Error()
+                            {
+                                Id = 1,
+                                Status = "Bad Request",
+                                Code = 404,
+                                Title = "Not Found",
+                                Detail = "Not Found"
+                            });
+                            return BadRequest(response);
+                        }
+
+                    }
+                    else
+                    {
+                        Response response = new Response();
+                        response.Errors.Add(new Error()
+                        {
+                            Id = 1,
+                            Status = "Bad Request",
+                            Code = 400,
+                            Title = "The Rol already exists",
+                            Detail = "The Rol already exists in the database"
+                        });
+                        return BadRequest(response);
+                    }
+                }
+                catch (Exception err)
+                {
+                    Response response = new Response();
+                    response.Errors.Add(new Error()
+                    {
+                        Id = 1,
+                        Status = "Internal Server Error",
+                        Code = 500,
+                        Title = err.Message,
+                        Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                    });
+                    return StatusCode(500, response);
+                }
+            }
+        }
+
+        [HttpDelete]
+        [Route("delete/{id}")]
+        /// <summary>
+        /// Elimina un rol de la base de datos
+        /// </summary>
+        /// <param name="id">Id del rol</param>
+        /// <returns>Retorna la id del rol eliminado</returns>
+
+        public ActionResult DeleteRole(int id)
+        {
+            try
+            {
+                using(ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    Rol role = db.Rols.Where(rol => rol.IdRol == id).FirstOrDefault();
+
+                    if (role != null)
+                    {
+                        db.Rols.Remove(role);
+                        db.SaveChanges();
+
+                        return Ok(new Response()
+                        {
+                            Data = new { deletedId = id }
+                        });
+                    }
+                    else
+                    {
+                        return NotFound(new Response()
+                        {
+                            Errors = new List<Error>()
+                            {
+                                new Error()
+                                {
+                                    Id = 1,
+                                    Status = "Not Found",
+                                    Code = 404,
+                                    Title = "No Data Found",
+                                    Detail = "Couldn't find the supplies."
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
+
+        [HttpPut]
+        [Route("update/{id}")]
+        /// <summary>
+        /// Actualiza los datos de un rol
+        /// </summary>
+        /// <param name="id">Id del rol para actualizar</param>
+        /// <param name="role">Objeto con los datos del rol actualizados</param>
+        /// <returns>Retorna un objeto con los datos del rol actualizados</returns>
+        /// 
+
+        public ActionResult UpdateRole(int id, [FromBody] Rol role)
+        {
+            try
+            {
+                using(ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    List<Error> errors = new List<Error>();
+                    Rol roleUpdated = db.Rols.Where(rol => rol.IdRol == id).FirstOrDefault();
+                    if (roleUpdated != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(roleUpdated.NombreRol))
+                        {
+                            roleUpdated.NombreRol = role.NombreRol;
+                        }
+                        else
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid field: NombreRol",
+                                Detail = "The field 'NombreRol'does not contain the required format."
+                            });
+                        }
+
+                        if (!string.IsNullOrEmpty(roleUpdated.DescripcionRol) || string.IsNullOrEmpty(roleUpdated.DescripcionRol))
+                        {
+                            roleUpdated.DescripcionRol = role.DescripcionRol;
+                        }
+                        else
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid field: DescripcionRol",
+                                Detail = "The field 'DescripcionRol' does not contain the required format."
+                            });
+                        }
+                        db.SaveChanges();
+
+                        return Ok(new Response()
+                        {
+                            Data = new RolDTO(roleUpdated),
+                            Errors = errors
+                        });
+                    }
+                    else
+                    {
+                        return NotFound(new Response()
+                        {
+                            Errors = new List<Error>()
+                            {
+                                new Error()
+                                {
+                                    Id = 1,
+                                    Status = "Not Found",
+                                    Code = 404,
+                                    Title = "No Data Found",
+                                    Detail = "Couldn´t find the role"
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
+
+
     }
 }
