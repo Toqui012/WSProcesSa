@@ -22,6 +22,7 @@ namespace WSProcesSa.Models
             this.ConnectionString = connectionString;
         }
 
+        public virtual DbSet<FlujoTarea> FlujoTareas { get; set; }
         public virtual DbSet<Rol> Rols { get; set; }
         public virtual DbSet<UnidadInterna> UnidadInternas { get; set; }
         public virtual DbSet<Usuario> Usuarios { get; set; }
@@ -40,6 +41,33 @@ namespace WSProcesSa.Models
         {
             modelBuilder.HasDefaultSchema("PORTAFOLIO")
                 .HasAnnotation("Relational:Collation", "USING_NLS_COMP");
+
+            modelBuilder.Entity<FlujoTarea>(entity =>
+            {
+                entity.HasKey(e => e.IdFlujoTarea)
+                    .HasName("SYS_C007440");
+
+                entity.ToTable("FLUJO_TAREA");
+
+                entity.Property(e => e.IdFlujoTarea)
+                    .HasColumnType("NUMBER")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("ID_FLUJO_TAREA");
+
+                entity.Property(e => e.DescripcionFlujoTarea)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false)
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("DESCRIPCION_FLUJO_TAREA");
+
+                entity.Property(e => e.NombreFlujoTarea)
+                    .IsRequired()
+                    .HasMaxLength(150)
+                    .IsUnicode(false)
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("NOMBRE_FLUJO_TAREA");
+            });
 
             modelBuilder.Entity<Rol>(entity =>
             {
@@ -175,6 +203,8 @@ namespace WSProcesSa.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ID_UNIDAD_INTERNA");
             });
+
+            modelBuilder.HasSequence("FLUJO_TAREA_SEQ");
 
             modelBuilder.HasSequence("ROL_SEQ");
 
