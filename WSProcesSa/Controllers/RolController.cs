@@ -210,7 +210,7 @@ namespace WSProcesSa.Controllers
                                     Status = "Not Found",
                                     Code = 404,
                                     Title = "No Data Found",
-                                    Detail = "Couldn't find the supplies."
+                                    Detail = "Couldn't find the Role."
                                 }
                             }
                         });
