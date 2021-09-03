@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -6,16 +7,21 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using WSProcesSa.Models.Common;
+using WSProcesSa.Services;
 
 namespace WSProcesSa
 {
     public class Startup
     {
         private readonly string AllowSpecificOrigins = "_allowSpecificOrigins";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -27,6 +33,36 @@ namespace WSProcesSa
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            //Inyeccion appsettings
+            var appSettingsSection = Configuration.GetSection(("AppSettings"));
+            services.Configure<AppSettings>(appSettingsSection);
+
+            //JWT
+            var appSettings = appSettingsSection.Get<AppSettings>();
+            // LLave única
+            var llave = Encoding.ASCII.GetBytes(appSettings.Secreto);
+            services.AddAuthentication(d =>
+            {
+                d.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                d.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(d => {
+                    d.RequireHttpsMetadata = false;
+                    d.SaveToken = true;
+                    d.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(llave),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+
+                });
+
+
+            // Inyección con Scoped
+            services.AddScoped<IUsuarioService, UsuarioService>();
 
             //DbContext Credentials
             services.AddDbContext<Models.ModelContext>(options =>
@@ -66,6 +102,8 @@ namespace WSProcesSa
             app.UseRouting();
 
             app.UseCors(AllowSpecificOrigins);
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

@@ -25,6 +25,7 @@ namespace WSProcesSa.Models
         public virtual DbSet<Rol> Rols { get; set; }
         public virtual DbSet<UnidadInterna> UnidadInternas { get; set; }
         public virtual DbSet<Usuario> Usuarios { get; set; }
+
         private string ConnectionString { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -32,7 +33,8 @@ namespace WSProcesSa.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseOracle("Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=xe)));User ID=PORTAFOLIO;Password=ASDASD123;Persist Security Info=True");
+                optionsBuilder.UseOracle("Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=xe)));User ID=portafolio;Password=portafolio;Persist Security Info=True");
+
             }
         }
 
@@ -44,7 +46,7 @@ namespace WSProcesSa.Models
             modelBuilder.Entity<Rol>(entity =>
             {
                 entity.HasKey(e => e.IdRol)
-                    .HasName("SYS_C007372");
+                    .HasName("SYS_C007622");
 
                 entity.ToTable("ROL");
 
@@ -70,7 +72,7 @@ namespace WSProcesSa.Models
             modelBuilder.Entity<UnidadInterna>(entity =>
             {
                 entity.HasKey(e => e.IdUnidadInterna)
-                    .HasName("SYS_C007375");
+                    .HasName("SYS_C007625");
 
                 entity.ToTable("UNIDAD_INTERNA");
 
@@ -96,71 +98,61 @@ namespace WSProcesSa.Models
             modelBuilder.Entity<Usuario>(entity =>
             {
                 entity.HasKey(e => e.RutUsuario)
-                    .HasName("SYS_C007386");
+                    .HasName("SYS_C007636");
 
                 entity.ToTable("USUARIO");
 
                 entity.Property(e => e.RutUsuario)
                     .HasMaxLength(12)
                     .IsUnicode(false)
-                    .ValueGeneratedOnAdd()
                     .HasColumnName("RUT_USUARIO");
 
                 entity.Property(e => e.ApellidoUsuario)
                     .IsRequired()
                     .HasMaxLength(100)
                     .IsUnicode(false)
-                    .ValueGeneratedOnAdd()
                     .HasColumnName("APELLIDO_USUARIO");
 
                 entity.Property(e => e.CorreoElectronico)
                     .IsRequired()
                     .HasMaxLength(100)
                     .IsUnicode(false)
-                    .ValueGeneratedOnAdd()
                     .HasColumnName("CORREO_ELECTRONICO");
 
                 entity.Property(e => e.IdRolUsuario)
                     .HasColumnType("NUMBER(38)")
-                    .ValueGeneratedOnAdd()
                     .HasColumnName("ID_ROL_USUARIO");
 
                 entity.Property(e => e.IdUnidadInternaUsuario)
                     .HasColumnType("NUMBER(38)")
-                    .ValueGeneratedOnAdd()
                     .HasColumnName("ID_UNIDAD_INTERNA_USUARIO");
 
                 entity.Property(e => e.NombreUsuario)
                     .IsRequired()
                     .HasMaxLength(100)
                     .IsUnicode(false)
-                    .ValueGeneratedOnAdd()
                     .HasColumnName("NOMBRE_USUARIO");
 
                 entity.Property(e => e.NumTelefono)
                     .HasColumnType("NUMBER(38)")
-                    .ValueGeneratedOnAdd()
                     .HasColumnName("NUM_TELEFONO");
 
                 entity.Property(e => e.Password)
                     .IsRequired()
                     .HasMaxLength(100)
                     .IsUnicode(false)
-                    .ValueGeneratedOnAdd()
                     .HasColumnName("PASSWORD");
 
                 entity.Property(e => e.SegundoApellido)
                     .IsRequired()
                     .HasMaxLength(100)
                     .IsUnicode(false)
-                    .ValueGeneratedOnAdd()
                     .HasColumnName("SEGUNDO_APELLIDO");
 
                 entity.Property(e => e.SegundoNombre)
                     .IsRequired()
                     .HasMaxLength(100)
                     .IsUnicode(false)
-                    .ValueGeneratedOnAdd()
                     .HasColumnName("SEGUNDO_NOMBRE");
 
                 entity.HasOne(d => d.IdRolUsuarioNavigation)
@@ -178,11 +170,7 @@ namespace WSProcesSa.Models
 
             modelBuilder.HasSequence("ROL_SEQ");
 
-            modelBuilder.HasSequence("ROL_SEQ1");
-
             modelBuilder.HasSequence("UNIDAD_INTERNA_SEQ");
-
-            modelBuilder.HasSequence("USUARIO_SEQ");
 
             OnModelCreatingPartial(modelBuilder);
         }

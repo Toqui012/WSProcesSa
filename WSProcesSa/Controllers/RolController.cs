@@ -9,11 +9,13 @@ using System.Threading.Tasks;
 using WSProcesSa.Models;
 using WSProcesSa.DTO;
 using WSProcesSa.Classes;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WSProcesSa.Controllers
 {
     [Route("api/rol")]
     [ApiController]
+    [Authorize]
     public class RolController : ControllerBase
     {
         private readonly IConfiguration config;
@@ -27,6 +29,7 @@ namespace WSProcesSa.Controllers
         }
 
         [HttpGet]
+       // [Authorize(Policy = Policies.Admin)]
         public ActionResult GetRol()
         {
             try

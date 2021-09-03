@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 using WSProcesSa.Models;
 using WSProcesSa.DTO;
 using WSProcesSa.Classes;
+using WSProcesSa.Models.Request;
+using WSProcesSa.Services;
+using WSProcesSa.Models.Response;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WSProcesSa.Controllers
 {
@@ -16,12 +20,14 @@ namespace WSProcesSa.Controllers
     [ApiController]
     public class UsuarioController : ControllerBase
     {
+        private IUsuarioService _usuarioService;
         private readonly IConfiguration config;
         private readonly IWebHostEnvironment hostEnvironment;
         private readonly IUrlHelper helper;
 
-        public UsuarioController(IConfiguration config, IWebHostEnvironment hostEnvironment)
+        public UsuarioController(IUsuarioService usuarioService, IConfiguration config, IWebHostEnvironment hostEnvironment)
         {
+            _usuarioService = usuarioService;
             this.config = config;
             this.hostEnvironment = hostEnvironment;
         }
@@ -540,6 +546,25 @@ namespace WSProcesSa.Controllers
 
 
 
+        [HttpPost("login")]
+        public IActionResult Autentificar([FromBody] AuthRequest model)
 
+        {
+            Respuesta  respuesta = new Respuesta();
+            var userResponse = _usuarioService.Auth(model);
+
+            if(userResponse == null)
+			{
+                respuesta.Exito = 0;
+                respuesta.Mensaje = "Usuario o Contraseña Incorrecta";
+                return BadRequest(respuesta);
+			}
+
+
+            respuesta.Exito = 1;
+            respuesta.Data = userResponse;
+
+            return Ok(respuesta);
+        }
     }
 }
