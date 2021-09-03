@@ -41,9 +41,15 @@ namespace WSProcesSa.Services
 
 				if (usuario == null) return null;
 
-				// Email = Correo electronico
+				// Le pasamos el Nombre del Usuario
+				userResponse.Nombre = usuario.NombreUsuario;
+				// Le pasamos el Apellido del Usuario
+				userResponse.Apellido = usuario.ApellidoUsuario;
+				// Le pasamos el Rol asociado al Usuario
 				userResponse.Rol = usuario.IdRolUsuario;
+				// Email = Correo electronico
 				userResponse.Email = usuario.CorreoElectronico;
+				// Le pasamos el Token
 				userResponse.Token = GetToken(usuario);
 			}
 			//Retornamos userResponse
