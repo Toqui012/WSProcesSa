@@ -1,0 +1,6 @@
+Scaffold-DbContext "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=xepdb1)));User ID=hr;Password=hr;Persist Security Info=True" Oracle.EntityFrameworkCore -Tables HR.COUNTRIES, HR.DEPARTMENTS, HR.EMPLOYEES, HR.JOB_HISTORY, HR.JOBS, HR.LOCATIONS, HR.REGIONS -OutputDir Models -force
+Scaffold-DbContext "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=xe)));User ID=PORTAFOLIO;Password=ASDASD123;Persist Security Info=True" Oracle.EntityFrameworkCore -OutputDir Models -force
+
+"ConnectionStrings": {
+	"Acceso": "Server=(local);Database=HR;Trusted_Connection=True;Persist Security Info=False;User ID=hr;Password=hr";
+}
