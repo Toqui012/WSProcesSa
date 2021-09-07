@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using WSProcesSa.Models;
 using WSProcesSa.DTO;
 using WSProcesSa.Classes;
+using WSProcesSa.Request;
+using WSProcesSa.Services;
 
 namespace WSProcesSa.Controllers
 {
@@ -219,6 +221,9 @@ namespace WSProcesSa.Controllers
                                 IdRolUsuario = newUserToAdd.IdRolUsuario,
                                 IdUnidadInternaUsuario = newUserToAdd.IdUnidadInternaUsuario
                             };
+
+                            //Encriptación clave usuario
+                            userToAdd.Password = Encrypt.GetSHA256(userToAdd.Password);
 
                             db.Usuarios.Add(userToAdd);
                             db.SaveChanges();
@@ -537,9 +542,5 @@ namespace WSProcesSa.Controllers
                 return StatusCode(500, response);
             }
         }
-
-
-
-
     }
 }

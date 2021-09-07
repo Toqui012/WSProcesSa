@@ -9,10 +9,12 @@ using System.Threading.Tasks;
 using WSProcesSa.Models;
 using WSProcesSa.DTO;
 using WSProcesSa.Classes;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WSProcesSa.Controllers
 {
     [Route("api/rol")]
+    [Authorize]
     [ApiController]
     public class RolController : ControllerBase
     {

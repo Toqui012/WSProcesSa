@@ -172,7 +172,7 @@ namespace WSProcesSa.Models
 
                 entity.Property(e => e.Password)
                     .IsRequired()
-                    .HasMaxLength(100)
+                    .HasMaxLength(256)
                     .IsUnicode(false)
                     .ValueGeneratedOnAdd()
                     .HasColumnName("PASSWORD");

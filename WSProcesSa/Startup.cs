@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -6,10 +7,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using WSProcesSa.Classes;
+using WSProcesSa.Services;
 
 namespace WSProcesSa
 {
@@ -27,6 +32,32 @@ namespace WSProcesSa
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
+
+            //jwt
+            var appSettings = appSettingsSection.Get<AppSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.Key);
+            services.AddAuthentication(d =>
+            {
+                d.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                d.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(d =>
+            {
+                d.RequireHttpsMetadata = false;
+                d.SaveToken = true;
+                d.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                };
+            });
+
+            services.AddScoped<IUserService, UserServices>();
 
             //DbContext Credentials
             services.AddDbContext<Models.ModelContext>(options =>
@@ -66,6 +97,8 @@ namespace WSProcesSa
             app.UseRouting();
 
             app.UseCors(AllowSpecificOrigins);
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
