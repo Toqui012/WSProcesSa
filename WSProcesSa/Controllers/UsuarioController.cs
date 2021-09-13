@@ -11,10 +11,12 @@ using WSProcesSa.DTO;
 using WSProcesSa.Classes;
 using WSProcesSa.Request;
 using WSProcesSa.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WSProcesSa.Controllers
 {
     [Route("api/usuario")]
+    [Authorize]
     [ApiController]
     public class UsuarioController : ControllerBase
     {
@@ -84,7 +86,9 @@ namespace WSProcesSa.Controllers
                 try
                 {
                     List<Error> errors = new List<Error>();
-                    if (!db.Usuarios.Any(user => user.RutUsuario == newUserToAdd.RutUsuario))
+                    if (!db.Usuarios.Any(user => user.RutUsuario == newUserToAdd.RutUsuario || 
+                        user.NombreUsuario == newUserToAdd.NombreUsuario ||
+                        user.CorreoElectronico == newUserToAdd.CorreoElectronico))
                     {
                         if (newUserToAdd.RutUsuario.Length > 12 || newUserToAdd.RutUsuario.Length < 8)
                         {
@@ -181,6 +185,11 @@ namespace WSProcesSa.Controllers
                                 Detail = "The field 'Password' can't be null or white space"
                             });
                         }
+                        else
+                        {
+                            //Se transforma la contraseña 
+                            newUserToAdd.Password = Encrypt.GetSHA256(newUserToAdd.Password);
+                        }
 
                         if (newUserToAdd.IdRolUsuario < 1)
                         {
@@ -255,8 +264,8 @@ namespace WSProcesSa.Controllers
                             Id = 1,
                             Status = "Bad Request",
                             Code = 400,
-                            Title = "The Rol already exists",
-                            Detail = "The Rol already exists in the database"
+                            Title = "The User already exists",
+                            Detail = "The User already exists in the database"
                         });
                         return BadRequest(response);
                     }

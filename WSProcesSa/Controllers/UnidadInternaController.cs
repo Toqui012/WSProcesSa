@@ -84,7 +84,8 @@ namespace WSProcesSa.Controllers
                 try
                 {
                     List<Error> errors = new List<Error>();
-                    if (!db.UnidadInternas.Any(unidad => unidad.IdUnidadInterna == newUnidadInternaToAdd.IdUnidadInterna))
+                    if (!db.UnidadInternas.Any(unidad => unidad.IdUnidadInterna == newUnidadInternaToAdd.IdUnidadInterna ||
+                                                         unidad.NombreUnidad == newUnidadInternaToAdd.NombreUnidad))
                     {
                         if (newUnidadInternaToAdd.IdUnidadInterna < 0)
                         {

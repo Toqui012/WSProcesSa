@@ -84,7 +84,8 @@ namespace WSProcesSa.Controllers
                 try
                 {
                     List<Error> errors = new List<Error>();
-                    if (!db.Rols.Any(rol => rol.IdRol == newRolToAdd.IdRol))
+                    if (!db.Rols.Any(rol => rol.IdRol == newRolToAdd.IdRol ||
+                                            rol.NombreRol == newRolToAdd.NombreRol))
                     {
                         if (newRolToAdd.IdRol < 0)
                         {

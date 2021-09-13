@@ -9,10 +9,12 @@ using System.Threading.Tasks;
 using WSProcesSa.Models;
 using WSProcesSa.DTO;
 using WSProcesSa.Classes;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WSProcesSa.Controllers
 {
     [Route("api/flujoTarea")]
+    [Authorize]
     [ApiController]
     public class FlujoTareasController : ControllerBase
     {
@@ -82,7 +84,8 @@ namespace WSProcesSa.Controllers
                 try
                 {
                     List<Error> errors = new List<Error>();
-                    if (!db.FlujoTareas.Any(f => f.IdFlujoTarea == newFlujoToAdd.IdFlujoTarea))
+                    if (!db.FlujoTareas.Any(f => f.IdFlujoTarea == newFlujoToAdd.IdFlujoTarea ||
+                                                 f.NombreFlujoTarea == newFlujoToAdd.NombreFlujoTarea))
                     {
                         if (newFlujoToAdd.IdFlujoTarea < 0)
                         {
