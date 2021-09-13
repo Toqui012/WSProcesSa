@@ -33,6 +33,7 @@ namespace WSProcesSa.Controllers
                 List<Error> errors = new List<Error>();
                 if (!string.IsNullOrWhiteSpace(authRequest.Email) || !string.IsNullOrWhiteSpace(authRequest.Password))
                 {
+                    authRequest.Password = Encrypt.GetSHA256(authRequest.Password);
                     var userResponse = _userService.Auth(authRequest);
                     if (userResponse != null)
                     {
