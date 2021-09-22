@@ -7,6 +7,11 @@ namespace WSProcesSa.Models
 {
     public partial class Usuario
     {
+        public Usuario()
+        {
+            Tareas = new HashSet<Tarea>();
+        }
+
         public string RutUsuario { get; set; }
         public string NombreUsuario { get; set; }
         public string SegundoNombre { get; set; }
@@ -20,5 +25,6 @@ namespace WSProcesSa.Models
 
         public virtual Rol IdRolUsuarioNavigation { get; set; }
         public virtual UnidadInterna IdUnidadInternaUsuarioNavigation { get; set; }
+        public virtual ICollection<Tarea> Tareas { get; set; }
     }
 }
