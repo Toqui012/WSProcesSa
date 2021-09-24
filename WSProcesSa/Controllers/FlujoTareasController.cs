@@ -29,7 +29,7 @@ namespace WSProcesSa.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetFlujoTarea()
+        public async Task<IActionResult> GetFlujoTarea()
         {
             try
             {
@@ -77,7 +77,7 @@ namespace WSProcesSa.Controllers
 
         [HttpPost]
         [Route("add")]
-        public ActionResult AddFlujoTareas([FromBody] FlujoTarea newFlujoToAdd)
+        public async Task<IActionResult> AddFlujoTareas([FromBody] FlujoTarea newFlujoToAdd)
         {
             using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
             {
@@ -94,7 +94,7 @@ namespace WSProcesSa.Controllers
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'IdRol'",
+                                Title = "Invalid Field 'IdFlujoTarea'",
                                 Detail = "The Field 'IdFlujoTarea' cannot be less 0"
                             });
                         }
@@ -114,6 +114,18 @@ namespace WSProcesSa.Controllers
                         if (string.IsNullOrWhiteSpace(newFlujoToAdd.DescripcionFlujoTarea))
                         {
                             newFlujoToAdd.DescripcionFlujoTarea = string.Empty;
+                        }
+
+                        if (newFlujoToAdd.FkIdTarea < 0)
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'FkIdTarea'",
+                                Detail = "The field 'FkIdTarea' can´t be less than 0"
+                            });
                         }
 
                         if (errors.Count == 0)
@@ -184,7 +196,7 @@ namespace WSProcesSa.Controllers
         /// <param name="id">Id del flujo</param>
         /// <returns>Retorna la id del flujo de tareas eliminado</returns>
 
-        public ActionResult DeleteFlujoTarea(int id)
+        public async Task<IActionResult> DeleteFlujoTarea(int id)
         {
             try
             {
@@ -246,7 +258,7 @@ namespace WSProcesSa.Controllers
         /// <returns>Retorna un objeto con los datos del flujo de tareas actualizados</returns>
         /// 
 
-        public ActionResult UpdateFlujoTareas(int id, [FromBody] FlujoTarea flujoTarea)
+        public async Task<IActionResult> UpdateFlujoTareas(int id, [FromBody] FlujoTarea flujoTarea)
         {
             try
             {
@@ -256,7 +268,7 @@ namespace WSProcesSa.Controllers
                     FlujoTarea flujoTareaUpdated = db.FlujoTareas.Where(f => f.IdFlujoTarea == id).FirstOrDefault();
                     if (flujoTareaUpdated != null)
                     {
-                        if (!string.IsNullOrWhiteSpace(flujoTareaUpdated.NombreFlujoTarea))
+                        if (!string.IsNullOrWhiteSpace(flujoTarea.NombreFlujoTarea))
                         {
                             flujoTareaUpdated.NombreFlujoTarea = flujoTarea.NombreFlujoTarea;
                         }
@@ -272,7 +284,7 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
-                        if (!string.IsNullOrEmpty(flujoTareaUpdated.DescripcionFlujoTarea) || string.IsNullOrEmpty(flujoTareaUpdated.DescripcionFlujoTarea))
+                        if (!string.IsNullOrEmpty(flujoTarea.DescripcionFlujoTarea) || string.IsNullOrEmpty(flujoTareaUpdated.DescripcionFlujoTarea))
                         {
                             flujoTareaUpdated.DescripcionFlujoTarea = flujoTarea.DescripcionFlujoTarea;
                         }
@@ -287,6 +299,23 @@ namespace WSProcesSa.Controllers
                                 Detail = "The field 'DescripcionFlujoTarea' does not contain the required format."
                             });
                         }
+
+                        if (flujoTarea.FkIdTarea > 0)
+                        {
+                            flujoTareaUpdated.FkIdTarea = flujoTarea.FkIdTarea;
+                        }
+                        else
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field: FkIdTarea",
+                                Detail = "The Field 'FkTarea' can´t be less than 0 "
+                            });
+                        } 
+
                         db.SaveChanges();
 
                         return Ok(new Response()

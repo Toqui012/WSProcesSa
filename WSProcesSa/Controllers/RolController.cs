@@ -29,7 +29,7 @@ namespace WSProcesSa.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetRol()
+        public async Task<IActionResult> GetRol()
         {
             try
             {
@@ -77,7 +77,7 @@ namespace WSProcesSa.Controllers
 
         [HttpPost]
         [Route("add")]
-        public ActionResult AddRol([FromBody]Rol newRolToAdd)
+        public async Task<IActionResult> AddRol([FromBody]Rol newRolToAdd)
         {
             using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
             {
@@ -183,7 +183,7 @@ namespace WSProcesSa.Controllers
         /// <param name="id">Id del rol</param>
         /// <returns>Retorna la id del rol eliminado</returns>
 
-        public ActionResult DeleteRole(int id)
+        public async Task<IActionResult> DeleteRole(int id)
         {
             try
             {
@@ -245,7 +245,7 @@ namespace WSProcesSa.Controllers
         /// <returns>Retorna un objeto con los datos del rol actualizados</returns>
         /// 
 
-        public ActionResult UpdateRole(int id, [FromBody] Rol role)
+        public async Task<IActionResult> UpdateRole(int id, [FromBody] Rol role)
         {
             try
             {
@@ -255,7 +255,7 @@ namespace WSProcesSa.Controllers
                     Rol roleUpdated = db.Rols.Where(rol => rol.IdRol == id).FirstOrDefault();
                     if (roleUpdated != null)
                     {
-                        if (!string.IsNullOrWhiteSpace(roleUpdated.NombreRol))
+                        if (!string.IsNullOrWhiteSpace(role.NombreRol))
                         {
                             roleUpdated.NombreRol = role.NombreRol;
                         }
@@ -271,7 +271,7 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
-                        if (!string.IsNullOrEmpty(roleUpdated.DescripcionRol) || string.IsNullOrEmpty(roleUpdated.DescripcionRol))
+                        if (!string.IsNullOrEmpty(role.DescripcionRol) || string.IsNullOrEmpty(role.DescripcionRol))
                         {
                             roleUpdated.DescripcionRol = role.DescripcionRol;
                         }

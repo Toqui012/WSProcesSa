@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -7,35 +8,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WSProcesSa.Models;
-using WSProcesSa.DTO;
 using WSProcesSa.Classes;
-using Microsoft.AspNetCore.Authorization;
+using WSProcesSa.DTO;
 
 namespace WSProcesSa.Controllers
 {
-    [Route("api/unidadInterna")]
+    [Route("api/TareaSubordinada")]
     [Authorize]
     [ApiController]
-    public class UnidadInternaController : ControllerBase
+    public class TareaSubordinadaController : ControllerBase
     {
         private readonly IConfiguration config;
         private readonly IWebHostEnvironment hostEnvironment;
         private readonly IUrlHelper helper;
 
-        public UnidadInternaController(IConfiguration config, IWebHostEnvironment hostEnvironment)
+        public TareaSubordinadaController(IConfiguration config, IWebHostEnvironment hostEnvironment)
         {
             this.config = config;
             this.hostEnvironment = hostEnvironment;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUnidadInterna()
+        public async Task<IActionResult> GetTask()
         {
             try
             {
                 using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
                 {
-                    List<UnidadInternaDTO> response = db.UnidadInternas.Select(u => new UnidadInternaDTO(u)).ToList();
+                    List<TareaSubordinadaDTO> response = db.TareaSubordinada.Select(task => new TareaSubordinadaDTO(task)).ToList();
                     if (response.Count == 0)
                     {
                         return NotFound(new Response()
@@ -47,9 +47,9 @@ namespace WSProcesSa.Controllers
                                 {
                                     Id = 1,
                                     Status = "Not Found",
-                                    Code = 404 ,
+                                    Code = 404,
                                     Title = "No Data Found",
-                                    Detail = "There is no data on database"
+                                    Detail = "There isno data on database"
                                 }
                             }
                         });
@@ -77,58 +77,79 @@ namespace WSProcesSa.Controllers
 
         [HttpPost]
         [Route("add")]
-        public async Task<IActionResult> AddUnidadInterna([FromBody] UnidadInterna newUnidadInternaToAdd)
+        public async Task<IActionResult> AddTareaSubordinada([FromBody] TareaSubordinadum newTareaSubordinadaToAdd)
         {
             using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
             {
                 try
                 {
                     List<Error> errors = new List<Error>();
-                    if (!db.UnidadInternas.Any(unidad => unidad.IdUnidadInterna == newUnidadInternaToAdd.IdUnidadInterna ||
-                                                         unidad.NombreUnidad == newUnidadInternaToAdd.NombreUnidad))
+                    if (!db.TareaSubordinada.Any(task => task.IdTareaSubordinada == newTareaSubordinadaToAdd.IdTareaSubordinada ||
+                                                 task.NombreSubordinada == newTareaSubordinadaToAdd.NombreSubordinada))
                     {
-                        if (newUnidadInternaToAdd.IdUnidadInterna < 0)
+                        if (newTareaSubordinadaToAdd.IdTareaSubordinada < 0)
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'IdUnidadInterna'",
-                                Detail = "The Field 'IdUnidadInterna' cannot be less 0"
+                                Title = "Invalid FIeld 'IdTareaSubordinada'",
+                                Detail = "The Field 'IdTareaSubordinada' can´t be less than 0"
                             });
                         }
 
-                        if (string.IsNullOrWhiteSpace(newUnidadInternaToAdd.NombreUnidad))
+                        if (string.IsNullOrWhiteSpace(newTareaSubordinadaToAdd.NombreSubordinada))
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'NombreUnidadInterna'",
-                                Detail = "The field 'NombreUnidadInterna' can't be null or white space"
+                                Title = "Invalid Field 'NombreSubordinada'",
+                                Detail = "The field 'NombreSubordinada' can't be null or white space"
                             });
                         }
 
-                        if (string.IsNullOrWhiteSpace(newUnidadInternaToAdd.DescripcionUnidad))
+                        if (string.IsNullOrWhiteSpace(newTareaSubordinadaToAdd.DescripcionSubordinada))
                         {
-                            newUnidadInternaToAdd.DescripcionUnidad = string.Empty;
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'DescripcionSubordinada'",
+                                Detail = "The field 'DescripcionSubordinada' can't be null or white space"
+                            });
+                        }
+
+                        if (newTareaSubordinadaToAdd.FkIdTarea < 0)
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'FkIdTarea'",
+                                Detail = "The field 'FkIdTarea' can´t be less than 0"
+                            });
                         }
 
                         if (errors.Count == 0)
                         {
-                            UnidadInterna unidadInternaToAdd = new UnidadInterna()
+                            TareaSubordinadum taskToAdd = new TareaSubordinadum()
                             {
-                                NombreUnidad = newUnidadInternaToAdd.NombreUnidad,
-                                DescripcionUnidad = newUnidadInternaToAdd.DescripcionUnidad,
+                                IdTareaSubordinada = newTareaSubordinadaToAdd.IdTareaSubordinada,
+                                NombreSubordinada = newTareaSubordinadaToAdd.NombreSubordinada,
+                                DescripcionSubordinada = newTareaSubordinadaToAdd.DescripcionSubordinada,
+                                FkIdTarea = newTareaSubordinadaToAdd.FkIdTarea,
                             };
 
-                            db.UnidadInternas.Add(unidadInternaToAdd);
+                            db.TareaSubordinada.Add(taskToAdd);
                             db.SaveChanges();
-                            return Created($"/detail/{newUnidadInternaToAdd.IdUnidadInterna}", new Response()
+                            return Created($"/detaiil/{newTareaSubordinadaToAdd.IdTareaSubordinada}", new Response()
                             {
-                                Data = new UnidadInternaDTO(unidadInternaToAdd)
+                                Data = new TareaSubordinadaDTO(taskToAdd)
                             });
                         }
                         else
@@ -144,7 +165,6 @@ namespace WSProcesSa.Controllers
                             });
                             return BadRequest(response);
                         }
-
                     }
                     else
                     {
@@ -154,11 +174,12 @@ namespace WSProcesSa.Controllers
                             Id = 1,
                             Status = "Bad Request",
                             Code = 400,
-                            Title = "The Unidad Interna already exists",
-                            Detail = "The Unidad Interna already exists in the database"
+                            Title = "The Task already exist",
+                            Detail = "The Task already exist in the database"
                         });
                         return BadRequest(response);
                     }
+                  
                 }
                 catch (Exception err)
                 {
@@ -177,29 +198,23 @@ namespace WSProcesSa.Controllers
         }
 
         [HttpDelete]
-        [Route("delete/{id}")]
-        /// <summary>
-        /// Elimina una unidad interna de la base de datos
-        /// </summary>
-        /// <param name="id">Id de la unidad Interna</param>
-        /// <returns>Retorna la id de la unidad interna eliminada</returns>
-
-        public async Task<IActionResult> DeleteUnidadInterna(int id)
+        [Route("delete/id")]
+        public async Task<IActionResult> DeleteTaskSubordinada(int id) 
         {
             try
             {
                 using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
                 {
-                    UnidadInterna unidadInterna = db.UnidadInternas.Where(unidad => unidad.IdUnidadInterna == id).FirstOrDefault();
+                    TareaSubordinadum tareaSubordinada = db.TareaSubordinada.FirstOrDefault(task => task.IdTareaSubordinada == id);
 
-                    if (unidadInterna != null)
+                    if (tareaSubordinada != null)
                     {
-                        db.UnidadInternas.Remove(unidadInterna);
+                        db.TareaSubordinada.Remove(tareaSubordinada);
                         db.SaveChanges();
 
                         return Ok(new Response()
                         {
-                            Data = new { deletedId = id }
+                            Data = new {deleteId = id}
                         });
                     }
                     else
@@ -214,11 +229,12 @@ namespace WSProcesSa.Controllers
                                     Status = "Not Found",
                                     Code = 404,
                                     Title = "No Data Found",
-                                    Detail = "Couldn't find the UnidadInterna."
+                                    Detail = "Couldn't find the TareaSubordinada."
                                 }
                             }
                         });
                     }
+
                 }
             }
             catch (Exception err)
@@ -228,7 +244,6 @@ namespace WSProcesSa.Controllers
                 {
                     Id = 1,
                     Status = "Internal Server Error",
-                    Code = 500,
                     Title = err.Message,
                     Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
                 });
@@ -238,60 +253,69 @@ namespace WSProcesSa.Controllers
 
         [HttpPut]
         [Route("update/{id}")]
-        /// <summary>
-        /// Actualiza los datos de una Unidad Interna
-        /// </summary>
-        /// <param name="id">Id de la Unidad Interna para actualizar</param>
-        /// <param name="unidad">Objeto con los datos de la unidad Interna actualizados</param>
-        /// <returns>Retorna un objeto con los datos de la Unidad Interna actualizados</returns>
-        /// 
-
-        public async Task<IActionResult> UpdateRole(int id, [FromBody] UnidadInterna unidad)
+        public async Task<IActionResult> UpdateTask(int id, [FromBody] TareaSubordinadum task)
         {
             try
             {
-                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso"))) 
                 {
                     List<Error> errors = new List<Error>();
-                    UnidadInterna unidadUpdated = db.UnidadInternas.Where(unidad => unidad.IdUnidadInterna == id).FirstOrDefault();
-                    if (unidadUpdated != null)
+                    TareaSubordinadum taskUpdated = db.TareaSubordinada.FirstOrDefault(task => task.IdTareaSubordinada == id);
+                    if (taskUpdated != null)
                     {
-                        if (!string.IsNullOrWhiteSpace(unidad.NombreUnidad))
-                        {
-                            unidadUpdated.NombreUnidad = unidad.NombreUnidad;
-                        }
-                        else
+                        if (string.IsNullOrWhiteSpace(task.NombreSubordinada))
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid field: NombreUnidad",
-                                Detail = "The field 'NombreUnidad'does not contain the required format."
+                                Title = "Invalid Field 'NombreSubordinada'",
+                                Detail = "The field 'NombreSubordinada' can't be null or white space"
                             });
+                        }
+                        else
+                        {
+                            taskUpdated.NombreSubordinada = task.NombreSubordinada;
                         }
 
-                        if (!string.IsNullOrEmpty(unidad.DescripcionUnidad) || string.IsNullOrEmpty(unidad.DescripcionUnidad))
-                        {
-                            unidadUpdated.DescripcionUnidad = unidad.DescripcionUnidad;
-                        }
-                        else
+                        if (string.IsNullOrWhiteSpace(task.DescripcionSubordinada))
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid field: DescripcionUnidad",
-                                Detail = "The field 'DescripcionUnidad' does not contain the required format."
+                                Title = "Invalid Field 'DescripcionSubordinada'",
+                                Detail = "The field 'DescripcionSubordinada' can't be null or white space"
                             });
                         }
+                        else
+                        {
+                            taskUpdated.DescripcionSubordinada = task.DescripcionSubordinada;
+                        }
+
+                        if (task.FkIdTarea < 0)
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'FkIdTarea'",
+                                Detail = "The field 'FkIdTarea' can't be null or equals than 0"
+                            });
+                        }
+                        else
+                        {
+                            taskUpdated.FkIdTarea = task.FkIdTarea;
+                        }
+
                         db.SaveChanges();
 
                         return Ok(new Response()
                         {
-                            Data = new UnidadInternaDTO(unidadUpdated),
+                            Data = new TareaSubordinadaDTO(taskUpdated),
                             Errors = errors
                         });
                     }
@@ -307,7 +331,7 @@ namespace WSProcesSa.Controllers
                                     Status = "Not Found",
                                     Code = 404,
                                     Title = "No Data Found",
-                                    Detail = "Couldn´t find the Unidad Interna"
+                                    Detail = "Couldn´t find the task"
                                 }
                             }
                         });

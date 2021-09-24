@@ -10,6 +10,7 @@ namespace WSProcesSa.DTO
         public decimal IdFlujoTarea { get; set; }
         public string NombreFlujoTarea { get; set; }
         public string DescripcionFlujoTarea { get; set; }
+        public decimal? FkIdTarea { get; set; }
 
         public FlujoTareasDTO()
         {
@@ -21,6 +22,7 @@ namespace WSProcesSa.DTO
             this.IdFlujoTarea = flujoTarea.IdFlujoTarea;
             this.NombreFlujoTarea = flujoTarea.NombreFlujoTarea;
             this.DescripcionFlujoTarea = flujoTarea.DescripcionFlujoTarea;
+            this.FkIdTarea = flujoTarea.FkIdTarea; 
         }
     }
 }

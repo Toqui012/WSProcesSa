@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -7,35 +8,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WSProcesSa.Models;
-using WSProcesSa.DTO;
 using WSProcesSa.Classes;
-using Microsoft.AspNetCore.Authorization;
+using WSProcesSa.DTO;
 
 namespace WSProcesSa.Controllers
 {
-    [Route("api/unidadInterna")]
+    [Route("api/justificacionTarea")]
     [Authorize]
     [ApiController]
-    public class UnidadInternaController : ControllerBase
+    public class JustificacionTareaController : ControllerBase
     {
+
         private readonly IConfiguration config;
         private readonly IWebHostEnvironment hostEnvironment;
         private readonly IUrlHelper helper;
 
-        public UnidadInternaController(IConfiguration config, IWebHostEnvironment hostEnvironment)
+        public JustificacionTareaController(IConfiguration config, IWebHostEnvironment hostEnvironment)
         {
             this.config = config;
             this.hostEnvironment = hostEnvironment;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUnidadInterna()
+        public async Task<IActionResult> GetJustificacion()
         {
-            try
+            using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
             {
-                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                try
                 {
-                    List<UnidadInternaDTO> response = db.UnidadInternas.Select(u => new UnidadInternaDTO(u)).ToList();
+                    List<JustificacionDTO> response = db.JustificacionTareas.Select(x => new JustificacionDTO(x)).ToList();
                     if (response.Count == 0)
                     {
                         return NotFound(new Response()
@@ -47,7 +48,7 @@ namespace WSProcesSa.Controllers
                                 {
                                     Id = 1,
                                     Status = "Not Found",
-                                    Code = 404 ,
+                                    Code = 404,
                                     Title = "No Data Found",
                                     Detail = "There is no data on database"
                                 }
@@ -59,76 +60,57 @@ namespace WSProcesSa.Controllers
                         return Ok(new Response() { Data = response });
                     }
                 }
-            }
-            catch (Exception err)
-            {
-                Response response = new Response();
-                response.Errors.Add(new Error()
+                catch (Exception err)
                 {
-                    Id = 1,
-                    Status = "Internal Server Error",
-                    Code = 500,
-                    Title = err.Message,
-                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
-                });
-                return StatusCode(500, response);
+                    Response response = new Response();
+                    response.Errors.Add(new Error()
+                    {
+                        Id = 1,
+                        Status = "Internal Server Error",
+                        Code = 500,
+                        Title = err.Message,
+                        Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                    });
+                    return StatusCode(500, response);
+                }
             }
         }
 
         [HttpPost]
         [Route("add")]
-        public async Task<IActionResult> AddUnidadInterna([FromBody] UnidadInterna newUnidadInternaToAdd)
+        public async Task<IActionResult> AddJustificacionTarea([FromBody] JustificacionTarea newJustificacionToAdd)
         {
             using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
             {
                 try
                 {
                     List<Error> errors = new List<Error>();
-                    if (!db.UnidadInternas.Any(unidad => unidad.IdUnidadInterna == newUnidadInternaToAdd.IdUnidadInterna ||
-                                                         unidad.NombreUnidad == newUnidadInternaToAdd.NombreUnidad))
+                    if (!db.JustificacionTareas.Any(task => task.IdJustificacion == newJustificacionToAdd.IdJustificacion))
                     {
-                        if (newUnidadInternaToAdd.IdUnidadInterna < 0)
+                        if (string.IsNullOrWhiteSpace(newJustificacionToAdd.Descripcion))
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'IdUnidadInterna'",
-                                Detail = "The Field 'IdUnidadInterna' cannot be less 0"
+                                Title = "Invalid Field 'DescripcionJustificacion'",
+                                Detail = "The Field 'DescripcionJustificacion' can´t be null or white space"
                             });
-                        }
-
-                        if (string.IsNullOrWhiteSpace(newUnidadInternaToAdd.NombreUnidad))
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'NombreUnidadInterna'",
-                                Detail = "The field 'NombreUnidadInterna' can't be null or white space"
-                            });
-                        }
-
-                        if (string.IsNullOrWhiteSpace(newUnidadInternaToAdd.DescripcionUnidad))
-                        {
-                            newUnidadInternaToAdd.DescripcionUnidad = string.Empty;
                         }
 
                         if (errors.Count == 0)
                         {
-                            UnidadInterna unidadInternaToAdd = new UnidadInterna()
+                            JustificacionTarea justificacionTarea = new JustificacionTarea()
                             {
-                                NombreUnidad = newUnidadInternaToAdd.NombreUnidad,
-                                DescripcionUnidad = newUnidadInternaToAdd.DescripcionUnidad,
+                                Descripcion = newJustificacionToAdd.Descripcion
                             };
 
-                            db.UnidadInternas.Add(unidadInternaToAdd);
+                            db.JustificacionTareas.Add(justificacionTarea);
                             db.SaveChanges();
-                            return Created($"/detail/{newUnidadInternaToAdd.IdUnidadInterna}", new Response()
+                            return Created($"/detail/{newJustificacionToAdd.IdJustificacion}", new Response()
                             {
-                                Data = new UnidadInternaDTO(unidadInternaToAdd)
+                                Data = new JustificacionDTO(justificacionTarea)
                             });
                         }
                         else
@@ -144,7 +126,6 @@ namespace WSProcesSa.Controllers
                             });
                             return BadRequest(response);
                         }
-
                     }
                     else
                     {
@@ -154,8 +135,8 @@ namespace WSProcesSa.Controllers
                             Id = 1,
                             Status = "Bad Request",
                             Code = 400,
-                            Title = "The Unidad Interna already exists",
-                            Detail = "The Unidad Interna already exists in the database"
+                            Title = "The User already exists",
+                            Detail = "The User already exists in the database"
                         });
                         return BadRequest(response);
                     }
@@ -178,23 +159,17 @@ namespace WSProcesSa.Controllers
 
         [HttpDelete]
         [Route("delete/{id}")]
-        /// <summary>
-        /// Elimina una unidad interna de la base de datos
-        /// </summary>
-        /// <param name="id">Id de la unidad Interna</param>
-        /// <returns>Retorna la id de la unidad interna eliminada</returns>
-
-        public async Task<IActionResult> DeleteUnidadInterna(int id)
+        public async Task<IActionResult> DeleteJustificacionTarea(int id) 
         {
             try
             {
                 using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
                 {
-                    UnidadInterna unidadInterna = db.UnidadInternas.Where(unidad => unidad.IdUnidadInterna == id).FirstOrDefault();
+                    JustificacionTarea justificacionTarea = db.JustificacionTareas.FirstOrDefault(task => task.IdJustificacion == id);
 
-                    if (unidadInterna != null)
+                    if (justificacionTarea != null)
                     {
-                        db.UnidadInternas.Remove(unidadInterna);
+                        db.JustificacionTareas.Remove(justificacionTarea);
                         db.SaveChanges();
 
                         return Ok(new Response()
@@ -214,7 +189,7 @@ namespace WSProcesSa.Controllers
                                     Status = "Not Found",
                                     Code = 404,
                                     Title = "No Data Found",
-                                    Detail = "Couldn't find the UnidadInterna."
+                                    Detail = "Couldn't find the task."
                                 }
                             }
                         });
@@ -238,60 +213,38 @@ namespace WSProcesSa.Controllers
 
         [HttpPut]
         [Route("update/{id}")]
-        /// <summary>
-        /// Actualiza los datos de una Unidad Interna
-        /// </summary>
-        /// <param name="id">Id de la Unidad Interna para actualizar</param>
-        /// <param name="unidad">Objeto con los datos de la unidad Interna actualizados</param>
-        /// <returns>Retorna un objeto con los datos de la Unidad Interna actualizados</returns>
-        /// 
-
-        public async Task<IActionResult> UpdateRole(int id, [FromBody] UnidadInterna unidad)
+        public async Task<IActionResult> UpdateJustificacionTarea(int id, [FromBody] JustificacionTarea justificacionTarea)
         {
             try
             {
                 using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
                 {
                     List<Error> errors = new List<Error>();
-                    UnidadInterna unidadUpdated = db.UnidadInternas.Where(unidad => unidad.IdUnidadInterna == id).FirstOrDefault();
-                    if (unidadUpdated != null)
+                    JustificacionTarea justificacionTareaUpdated = db.JustificacionTareas.FirstOrDefault(task => task.IdJustificacion == id);
+                    if (justificacionTareaUpdated != null)
                     {
-                        if (!string.IsNullOrWhiteSpace(unidad.NombreUnidad))
-                        {
-                            unidadUpdated.NombreUnidad = unidad.NombreUnidad;
-                        }
-                        else
+                        if (string.IsNullOrWhiteSpace(justificacionTarea.Descripcion))
                         {
                             errors.Add(new Error()
                             {
+
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid field: NombreUnidad",
-                                Detail = "The field 'NombreUnidad'does not contain the required format."
+                                Title = "Invalid Field 'descripcion'",
+                                Detail = "The field 'descripcion' can't be null or white space"
                             });
+                        }
+                        else
+                        {
+                            justificacionTareaUpdated.Descripcion = justificacionTarea.Descripcion;
                         }
 
-                        if (!string.IsNullOrEmpty(unidad.DescripcionUnidad) || string.IsNullOrEmpty(unidad.DescripcionUnidad))
-                        {
-                            unidadUpdated.DescripcionUnidad = unidad.DescripcionUnidad;
-                        }
-                        else
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid field: DescripcionUnidad",
-                                Detail = "The field 'DescripcionUnidad' does not contain the required format."
-                            });
-                        }
                         db.SaveChanges();
 
                         return Ok(new Response()
                         {
-                            Data = new UnidadInternaDTO(unidadUpdated),
+                            Data = new JustificacionDTO(justificacionTareaUpdated),
                             Errors = errors
                         });
                     }
@@ -307,11 +260,12 @@ namespace WSProcesSa.Controllers
                                     Status = "Not Found",
                                     Code = 404,
                                     Title = "No Data Found",
-                                    Detail = "Couldn´t find the Unidad Interna"
+                                    Detail = "Couldn´t find the JustificacionTarea"
                                 }
                             }
                         });
                     }
+
                 }
             }
             catch (Exception err)

@@ -6,38 +6,37 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WSProcesSa.Classes;
+using WSProcesSa.Controllers;
 using WSProcesSa.Models;
 using WSProcesSa.DTO;
-using WSProcesSa.Classes;
-using WSProcesSa.Request;
-using WSProcesSa.Services;
 using Microsoft.AspNetCore.Authorization;
 
 namespace WSProcesSa.Controllers
 {
-    [Route("api/usuario")]
+    [Route("api/tarea")]
     [Authorize]
     [ApiController]
-    public class UsuarioController : ControllerBase
+    public class TareaController : ControllerBase
     {
         private readonly IConfiguration config;
         private readonly IWebHostEnvironment hostEnvironment;
         private readonly IUrlHelper helper;
 
-        public UsuarioController(IConfiguration config, IWebHostEnvironment hostEnvironment)
+        public TareaController(IConfiguration config, IWebHostEnvironment hostEnvironment)
         {
             this.config = config;
             this.hostEnvironment = hostEnvironment;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUser()
+        public async Task<IActionResult> GetTask()
         {
             try
             {
                 using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
                 {
-                    List<UsuarioDTO> response = db.Usuarios.Select(u => new UsuarioDTO(u)).ToList();
+                    List<TareaDTO> response = db.Tareas.Select(f => new TareaDTO(f)).ToList();
                     if (response.Count == 0)
                     {
                         return NotFound(new Response()
@@ -79,18 +78,88 @@ namespace WSProcesSa.Controllers
 
         [HttpPost]
         [Route("add")]
-        public async Task<IActionResult> AddUser([FromBody] Usuario newUserToAdd)
+        public async Task<IActionResult>AddTask([FromBody] Tarea newTareaToAdd) 
         {
             using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
             {
                 try
                 {
                     List<Error> errors = new List<Error>();
-                    if (!db.Usuarios.Any(user => user.RutUsuario == newUserToAdd.RutUsuario || 
-                        user.NombreUsuario == newUserToAdd.NombreUsuario ||
-                        user.CorreoElectronico == newUserToAdd.CorreoElectronico))
+                    if (!db.Tareas.Any(task => task.IdTarea == newTareaToAdd.IdTarea))
                     {
-                        if (newUserToAdd.RutUsuario.Length > 12 || newUserToAdd.RutUsuario.Length < 8)
+                        if (newTareaToAdd.IdTarea < 0)
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'IdTarea'",
+                                Detail = "The Field 'IdTarea' cannot be less than 0"
+                            });
+                        }
+
+                        if (string.IsNullOrWhiteSpace(newTareaToAdd.NombreTarea))
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'NombreTarea'",
+                                Detail = "The Field 'NombreTarea' cannot be less 0"
+                            });
+                        }
+
+                        if (string.IsNullOrWhiteSpace(newTareaToAdd.DescripcionTarea))
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'DescripcionTarea'",
+                                Detail = "The Field 'DescripcionTarea' can´t be null or whitespace"
+                            });
+                        }
+
+                        if (newTareaToAdd.FechaPlazo < DateTime.Now)
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'FechaPlazo'",
+                                Detail = "The Field 'FechaPlazo' can´t be null or whitespace"
+                            });
+                        }
+
+                        if (string.IsNullOrWhiteSpace(newTareaToAdd.ReporteProblema))
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'ReporteProblema'",
+                                Detail = "The Field 'ReporteProblema' can´t be null or whitespace"
+                            });
+                        }
+
+                        if (string.IsNullOrWhiteSpace(newTareaToAdd.AsignacionTarea))
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'AsignacionTarea'",
+                                Detail = "The Field 'AsignacionTarea' can´t be null or whitespace"
+                            });
+                        }
+
+                        if (newTareaToAdd.FkRutUsuario.Length > 12 || newTareaToAdd.FkRutUsuario.Length < 8 || string.IsNullOrWhiteSpace(newTareaToAdd.FkRutUsuario))
                         {
                             errors.Add(new Error()
                             {
@@ -102,143 +171,63 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
-                        if (string.IsNullOrWhiteSpace(newUserToAdd.NombreUsuario))
+                        if (newTareaToAdd.FkIdJustificacion < 0)
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'NombreRol'",
-                                Detail = "The field 'NombreUsuario' can't be null or white space"
+                                Title = "Invalid Field 'FkIdJustificación'",
+                                Detail = "The Field 'FkIdJustificación' can't be less than 0"
                             });
                         }
 
-                        if (string.IsNullOrWhiteSpace(newUserToAdd.SegundoNombre))
+                        if (newTareaToAdd.FkEstadoTarea < 0)
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'SegundoNombre'",
-                                Detail = "The field 'SegundoNombre' can't be null or white space"
+                                Title = "Invalid Field 'FkEstadoTarea'",
+                                Detail = "The Field 'FkIdJustificación' can't be less than 0"
                             });
                         }
 
-                        if (string.IsNullOrWhiteSpace(newUserToAdd.ApellidoUsuario))
+                        if (newTareaToAdd.FkPrioridadTarea < 0)
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'ApellidoUsuario'",
-                                Detail = "The field 'ApellidoUsuario' can't be null or white space"
-                            });
-                        }
-
-                        if (string.IsNullOrWhiteSpace(newUserToAdd.SegundoApellido))
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'SegundoApellido'",
-                                Detail = "The field 'SegundoApellido' can't be null or white space"
-                            });
-                        }
-
-                        if (string.IsNullOrWhiteSpace(newUserToAdd.CorreoElectronico))
-                        {
-                             errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'ApellidoUsuario'",
-                                Detail = "The field 'ApellidoUsuario' can't be null or white space"
-                            });
-                        }
-
-                        if (newUserToAdd.NumTelefono.ToString().Length != 9)
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'NumTelefono'",
-                                Detail = "The field 'NumTelefono' can't be null or white space"
-                            });
-                        }
-
-                        if (string.IsNullOrWhiteSpace(newUserToAdd.Password))
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'Password'",
-                                Detail = "The field 'Password' can't be null or white space"
-                            });
-                        }
-                        else
-                        {
-                            //Se transforma la contraseña 
-                            newUserToAdd.Password = Encrypt.GetSHA256(newUserToAdd.Password);
-                        }
-
-                        if (newUserToAdd.IdRolUsuario < 1)
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'IdRolUsuario'",
-                                Detail = "The field 'IdRolUsuario' cannot be less than 0"
-                            });
-                        }
-
-                        if (newUserToAdd.IdUnidadInternaUsuario < 1)
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'IdUnidadInternaUsuario'",
-                                Detail = "The field 'IdUnidadInternaUsuario' cannot be less than 0"
+                                Title = "Invalid Field 'FkPrioridadTarea'",
+                                Detail = "The Field 'FkPrioridadTarea' can't be less than 0"
                             });
                         }
 
                         if (errors.Count == 0)
                         {
-                            Usuario userToAdd = new Usuario()
+                            Tarea taskAdd = new Tarea()
                             {
-                                RutUsuario = newUserToAdd.RutUsuario,
-                                NombreUsuario = newUserToAdd.NombreUsuario,
-                                SegundoNombre = newUserToAdd.SegundoNombre,
-                                ApellidoUsuario = newUserToAdd.ApellidoUsuario,
-                                SegundoApellido = newUserToAdd.SegundoApellido,
-                                NumTelefono = newUserToAdd.NumTelefono,
-                                CorreoElectronico = newUserToAdd.CorreoElectronico,
-                                Password = newUserToAdd.Password,
-                                IdRolUsuario = newUserToAdd.IdRolUsuario,
-                                IdUnidadInternaUsuario = newUserToAdd.IdUnidadInternaUsuario
+                                IdTarea = newTareaToAdd.IdTarea,
+                                NombreTarea = newTareaToAdd.NombreTarea,
+                                DescripcionTarea = newTareaToAdd.DescripcionTarea,
+                                FechaPlazo = newTareaToAdd.FechaPlazo,
+                                ReporteProblema = newTareaToAdd.ReporteProblema,
+                                AsignacionTarea = newTareaToAdd.AsignacionTarea,
+                                FkRutUsuario = newTareaToAdd.FkRutUsuario,
+                                FkIdJustificacion = newTareaToAdd.FkIdJustificacion,
+                                FkEstadoTarea = newTareaToAdd.FkEstadoTarea,
+                                FkPrioridadTarea = newTareaToAdd.FkPrioridadTarea,
                             };
 
-                            //Encriptación clave usuario
-                            userToAdd.Password = Encrypt.GetSHA256(userToAdd.Password);
-
-                            db.Usuarios.Add(userToAdd);
+                            db.Tareas.Add(taskAdd);
                             db.SaveChanges();
-                            return Created($"/detail/{newUserToAdd.RutUsuario}", new Response()
+                            return Created($"/detail/{newTareaToAdd.IdTarea}", new Response()
                             {
-                                Data = new UsuarioDTO(userToAdd)
+                                Data = new TareaDTO(taskAdd)
                             });
                         }
                         else
@@ -254,7 +243,6 @@ namespace WSProcesSa.Controllers
                             });
                             return BadRequest(response);
                         }
-
                     }
                     else
                     {
@@ -264,8 +252,8 @@ namespace WSProcesSa.Controllers
                             Id = 1,
                             Status = "Bad Request",
                             Code = 400,
-                            Title = "The User already exists",
-                            Detail = "The User already exists in the database"
+                            Title = "The Task already exists",
+                            Detail = "The Task already exists in the database"
                         });
                         return BadRequest(response);
                     }
@@ -287,29 +275,24 @@ namespace WSProcesSa.Controllers
         }
 
         [HttpDelete]
-        [Route("delete/{rut}")]
-        /// <summary>
-        /// Elimina un usuario de la base de datos
-        /// </summary>
-        /// <param name="rut">Id del usuario</param>
-        /// <returns>Retorna la id del usuario eliminado eliminado</returns>
+        [Route("delete/{id}")]
 
-        public async Task<IActionResult> DeleteUser(string rut)
+        public async Task<IActionResult> DeleteTask(int id)
         {
             try
             {
                 using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
                 {
-                    Usuario usuario = db.Usuarios.Where(user => user.RutUsuario == rut).FirstOrDefault();
+                    Tarea task = db.Tareas.Where(f => f.IdTarea == id).FirstOrDefault();
 
-                    if (usuario != null)
+                    if (task != null)
                     {
-                        db.Usuarios.Remove(usuario);
+                        db.Tareas.Remove(task);
                         db.SaveChanges();
 
                         return Ok(new Response()
                         {
-                            Data = new { deletedId = rut }
+                            Data = new { deletedId = id }
                         });
                     }
                     else
@@ -324,7 +307,7 @@ namespace WSProcesSa.Controllers
                                     Status = "Not Found",
                                     Code = 404,
                                     Title = "No Data Found",
-                                    Detail = "Couldn't find the User."
+                                    Detail = "Couldn't find the Task."
                                 }
                             }
                         });
@@ -347,176 +330,185 @@ namespace WSProcesSa.Controllers
         }
 
         [HttpPut]
-        [Route("update/{rut}")]
-        /// <summary>
-        /// Actualiza los datos de un User
-        /// </summary>
-        /// <param name="rut">Id del usuario para actualizar</param>
-        /// <param name="user">Objeto con los datos del Usuario actualizados</param>
-        /// <returns>Retorna un objeto con los datos del Usuario actualizados</returns>
-        /// 
+        [Route("update/{id}")]
 
-        public async Task<IActionResult> UpdateRole(string rut, [FromBody] Usuario user)
+        public async Task<IActionResult> UpdateTask(int id, [FromBody] Tarea task)
         {
             try
             {
                 using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
                 {
                     List<Error> errors = new List<Error>();
-                    Usuario userUpdated = db.Usuarios.Where(u => u.RutUsuario == rut).FirstOrDefault();
-                    if (userUpdated != null)
+                    Tarea taskUpdated = db.Tareas.Where(f => f.IdTarea == id).FirstOrDefault();
+                    if (taskUpdated != null)
                     {
-                        if (string.IsNullOrWhiteSpace(user.NombreUsuario))
+                        if (task.IdTarea < 0)
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'NombreRol'",
-                                Detail = "The field 'NombreUsuario' can't be null or white space"
+                                Title = "Invalid Field 'IdTarea'",
+                                Detail = "The Field 'IdTarea' cannot be less than 0"
                             });
                         }
                         else
                         {
-                            userUpdated.NombreUsuario = user.NombreUsuario;
+                            taskUpdated.IdTarea = task.IdTarea;
                         }
 
-                        if (string.IsNullOrWhiteSpace(user.SegundoNombre))
+                        if (string.IsNullOrWhiteSpace(task.NombreTarea))
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'SegundoNombre'",
-                                Detail = "The field 'SegundoNombre' can't be null or white space"
+                                Title = "Invalid Field 'NombreTarea'",
+                                Detail = "The Field 'NombreTarea' cannot be less 0"
                             });
                         }
                         else
                         {
-                            userUpdated.SegundoNombre = user.SegundoNombre;
+                            taskUpdated.NombreTarea = task.NombreTarea;
                         }
 
-                        if (string.IsNullOrWhiteSpace(user.ApellidoUsuario))
+                        if (string.IsNullOrWhiteSpace(task.DescripcionTarea))
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'ApellidoUsuario'",
-                                Detail = "The field 'ApellidoUsuario' can't be null or white space"
+                                Title = "Invalid Field 'DescripcionTarea'",
+                                Detail = "The Field 'DescripcionTarea' can´t be null or whitespace"
                             });
                         }
                         else
                         {
-                            userUpdated.ApellidoUsuario = user.ApellidoUsuario;
+                            taskUpdated.DescripcionTarea = task.DescripcionTarea;
                         }
 
-                        if (string.IsNullOrWhiteSpace(user.SegundoApellido))
+                        if (task.FechaPlazo < DateTime.Now)
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'SegundoApellido'",
-                                Detail = "The field 'SegundoApellido' can't be null or white space"
+                                Title = "Invalid Field 'FechaPlazo'",
+                                Detail = "The Field 'FechaPlazo' can´t be null or whitespace"
                             });
                         }
                         else
                         {
-                            userUpdated.SegundoApellido = user.SegundoApellido;
+                            taskUpdated.FechaPlazo = task.FechaPlazo;
                         }
 
-                        if (string.IsNullOrWhiteSpace(user.CorreoElectronico))
+                        if (string.IsNullOrWhiteSpace(task.ReporteProblema))
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'CorreoElectronico'",
-                                Detail = "The field 'CorreoElectronico' can't be null or white space"
+                                Title = "Invalid Field 'ReporteProblema'",
+                                Detail = "The Field 'ReporteProblema' can´t be null or whitespace"
                             });
                         }
                         else
                         {
-                            userUpdated.CorreoElectronico = user.CorreoElectronico;
+                            taskUpdated.ReporteProblema = task.ReporteProblema;
                         }
 
-                        if (user.NumTelefono.ToString().Length != 9)
+                        if (string.IsNullOrWhiteSpace(task.AsignacionTarea))
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'NumTelefono'",
-                                Detail = "The field 'NumTelefono' can't be null or white space"
+                                Title = "Invalid Field 'AsignacionTarea'",
+                                Detail = "The Field 'AsignacionTarea' can´t be null or whitespace"
                             });
                         }
                         else
                         {
-                            userUpdated.NumTelefono = user.NumTelefono;
+                            taskUpdated.AsignacionTarea = task.AsignacionTarea;
                         }
 
-                        if (string.IsNullOrWhiteSpace(user.Password))
+                        if (task.FkRutUsuario.Length > 12 || task.FkRutUsuario.Length < 8 || string.IsNullOrWhiteSpace(task.FkRutUsuario))
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'Password'",
-                                Detail = "The field 'Password' can't be null or white space"
+                                Title = "Invalid Field 'RutUsuario'",
+                                Detail = "The Field 'RutUsuarop' can't be null or white space"
                             });
                         }
                         else
                         {
-                            userUpdated.Password = user.Password;
+                            taskUpdated.FkRutUsuario = task.FkRutUsuario;
                         }
 
-                        if (user.IdRolUsuario < 1)
+                        if (task.FkIdJustificacion < 0)
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'IdRolUsuario'",
-                                Detail = "The field 'IdRolUsuario' cannot be less than 0"
+                                Title = "Invalid Field 'FkIdJustificación'",
+                                Detail = "The Field 'FkIdJustificación' can't be less than 0"
                             });
                         }
                         else
                         {
-                            userUpdated.IdRolUsuario = user.IdRolUsuario;
+                            taskUpdated.FkIdJustificacion = task.FkIdJustificacion;
                         }
 
-                        if (user.IdUnidadInternaUsuario < 1)
+                        if (task.FkEstadoTarea < 0)
                         {
                             errors.Add(new Error()
                             {
                                 Id = errors.Count + 1,
                                 Status = "Bad Request",
                                 Code = 400,
-                                Title = "Invalid Field 'IdUnidadInternaUsuario'",
-                                Detail = "The field 'IdUnidadInternaUsuario' cannot be less than 0"
+                                Title = "Invalid Field 'FkEstadoTarea'",
+                                Detail = "The Field 'FkIdJustificación' can't be less than 0"
                             });
                         }
                         else
                         {
-                            userUpdated.IdUnidadInternaUsuario = user.IdUnidadInternaUsuario;
+                            taskUpdated.FkEstadoTarea = task.FkEstadoTarea;
+                        }
+
+                        if (task.FkPrioridadTarea < 0)
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'FkPrioridadTarea'",
+                                Detail = "The Field 'FkPrioridadTarea' can't be less than 0"
+                            });
+                        }
+                        else
+                        {
+                            taskUpdated.FkPrioridadTarea = task.FkPrioridadTarea;
                         }
 
                         db.SaveChanges();
-
                         return Ok(new Response()
                         {
-                            Data = new UsuarioDTO(userUpdated),
+                            Data = new TareaDTO(taskUpdated),
                             Errors = errors
                         });
+
                     }
                     else
                     {
@@ -530,7 +522,7 @@ namespace WSProcesSa.Controllers
                                     Status = "Not Found",
                                     Code = 404,
                                     Title = "No Data Found",
-                                    Detail = "Couldn´t find the user"
+                                    Detail = "Couldn´t find the Task"
                                 }
                             }
                         });

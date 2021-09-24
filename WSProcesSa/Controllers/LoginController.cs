@@ -26,7 +26,7 @@ namespace WSProcesSa.Controllers
         [HttpPost]
         [Route("addlogin")]
 
-        public ActionResult Autentification([FromBody] AuthRequest authRequest)
+        public async Task<IActionResult> Autentification([FromBody] AuthRequest authRequest)
         {
             try
             {
