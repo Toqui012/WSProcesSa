@@ -123,6 +123,8 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
+                        //Cambio del formato de la fecha de plazo
+                        newTareaToAdd.FechaPlazo = DateTime.Parse(newTareaToAdd.FechaPlazo.ToString("dd/MM/yyyy"));
                         if (newTareaToAdd.FechaPlazo < DateTime.Now)
                         {
                             errors.Add(new Error()
@@ -342,6 +344,8 @@ namespace WSProcesSa.Controllers
                     Tarea taskUpdated = db.Tareas.Where(f => f.IdTarea == id).FirstOrDefault();
                     if (taskUpdated != null)
                     {
+                        task.FechaPlazo = DateTime.Parse(task.FechaPlazo.ToString("dd/MM/yyyy"));
+
                         if (task.IdTarea < 0)
                         {
                             errors.Add(new Error()
