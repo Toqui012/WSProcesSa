@@ -123,8 +123,6 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
-                        //Cambio del formato de la fecha de plazo
-                        newTareaToAdd.FechaPlazo = DateTime.Parse(newTareaToAdd.FechaPlazo.ToString("dd/MM/yyyy"));
                         if (newTareaToAdd.FechaPlazo < DateTime.Now)
                         {
                             errors.Add(new Error()
