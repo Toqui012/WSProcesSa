@@ -271,21 +271,11 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
-                        if (!string.IsNullOrEmpty(role.DescripcionRol) || string.IsNullOrEmpty(role.DescripcionRol))
+                        if (!string.IsNullOrWhiteSpace(role.DescripcionRol))
                         {
                             roleUpdated.DescripcionRol = role.DescripcionRol;
                         }
-                        else
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid field: DescripcionRol",
-                                Detail = "The field 'DescripcionRol' does not contain the required format."
-                            });
-                        }
+                      
                         db.SaveChanges();
 
                         return Ok(new Response()
