@@ -77,9 +77,9 @@ namespace WSProcesSa.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("oneUser")]
-        public async Task<IActionResult>GetOneUser([FromBody] string rutUsuario)
+        [HttpGet]
+        [Route("oneUser/{rutUsuario}")]
+        public async Task<IActionResult>GetOneUser(string rutUsuario)
         {
             using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
             {
