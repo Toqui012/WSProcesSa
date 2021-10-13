@@ -29,7 +29,7 @@ namespace WSProcesSa.DTO
             this.NombreUsuario = usuario.NombreUsuario;
             this.SegundoNombre = usuario.SegundoNombre;
             this.ApellidoUsuario = usuario.ApellidoUsuario;
-            this.SegundoNombre = usuario.SegundoApellido;
+            this.SegundoApellido = usuario.SegundoApellido;
             this.NumTelefono = usuario.NumTelefono;
             this.CorreoElectronico = usuario.CorreoElectronico;
             this.Password = usuario.Password;
