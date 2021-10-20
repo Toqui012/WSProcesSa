@@ -191,7 +191,7 @@ namespace WSProcesSa.Controllers
                                 Status = "Bad Request",
                                 Code = 400,
                                 Title = "Invalid Field 'FkEstadoTarea'",
-                                Detail = "The Field 'FkIdJustificación' can't be less than 0"
+                                Detail = "The Field 'FkIdEstadoTarea' can't be less than 0"
                             });
                         }
 

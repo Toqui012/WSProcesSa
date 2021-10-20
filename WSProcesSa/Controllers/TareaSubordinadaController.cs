@@ -174,6 +174,30 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
+                        if (newTareaSubordinadaToAdd.FkEstadoTarea < 0)
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'FkIdEstadoTarea'",
+                                Detail = "The field 'FkIdEstadoTarea' can´t be less than 0"
+                            });
+                        }
+
+                        if (newTareaSubordinadaToAdd.FkPrioridadTarea < 0)
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'FkPrioridadTarea'",
+                                Detail = "The field 'FkPrioridadTarea' can´t be less than 0"
+                            });
+                        }
+
                         if (newTareaSubordinadaToAdd.FkIdTarea < 0)
                         {
                             errors.Add(new Error()
@@ -193,6 +217,8 @@ namespace WSProcesSa.Controllers
                                 IdTareaSubordinada = newTareaSubordinadaToAdd.IdTareaSubordinada,
                                 NombreSubordinada = newTareaSubordinadaToAdd.NombreSubordinada,
                                 DescripcionSubordinada = newTareaSubordinadaToAdd.DescripcionSubordinada,
+                                FkEstadoTarea = newTareaSubordinadaToAdd.FkEstadoTarea,
+                                FkPrioridadTarea = newTareaSubordinadaToAdd.FkPrioridadTarea,
                                 FkIdTarea = newTareaSubordinadaToAdd.FkIdTarea,
                             };
 
