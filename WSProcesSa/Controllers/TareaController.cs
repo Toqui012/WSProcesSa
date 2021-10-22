@@ -545,5 +545,75 @@ namespace WSProcesSa.Controllers
                 return StatusCode(500, response);
             }
         }
+
+        [HttpPut]
+        [Route("assignTask/{idTask}/{rutUser}")]
+        public async Task<IActionResult> assignTask(int idTask, string rutUser)
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    List<Error> errors = new List<Error>();
+                    Tarea taskUpdated = db.Tareas.FirstOrDefault(t => t.IdTarea == idTask);
+                    if (taskUpdated != null)
+                    {
+                        if (rutUser.Length > 12 || rutUser.Length < 8 || string.IsNullOrWhiteSpace(rutUser))
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'RutUsuario'",
+                                Detail = "The Field 'RutUsuaro' can't be null or white space"
+                            });
+                        }
+                        else
+                        {
+                            taskUpdated.FkRutUsuario = rutUser;
+                        }
+
+                        db.SaveChanges();
+                        return Ok(new Response()
+                        {
+                            Data = new TareaDTO(taskUpdated),
+                            Errors = errors
+                        });
+                    }
+                    else
+                    {
+                        return NotFound(new Response()
+                        {
+                            Errors = new List<Error>()
+                            {
+                                new Error()
+                                {
+                                    Id = 1,
+                                    Status = "Not Found",
+                                    Code = 404,
+                                    Title = "No Data Found",
+                                    Detail = "Couldn´t find the Task"
+                                }
+                            }
+                        });
+                    }
+
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
     }
 }
