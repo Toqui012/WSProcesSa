@@ -344,22 +344,6 @@ namespace WSProcesSa.Controllers
                     {
                         task.FechaPlazo = DateTime.Parse(task.FechaPlazo.ToString("dd/MM/yyyy"));
 
-                        if (task.IdTarea < 0)
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'IdTarea'",
-                                Detail = "The Field 'IdTarea' cannot be less than 0"
-                            });
-                        }
-                        else
-                        {
-                            taskUpdated.IdTarea = task.IdTarea;
-                        }
-
                         if (string.IsNullOrWhiteSpace(task.NombreTarea))
                         {
                             errors.Add(new Error()
