@@ -76,6 +76,57 @@ namespace WSProcesSa.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("oneTask/{idTarea}")]
+        public async Task<IActionResult> GetOneTask(int idTarea)
+        {
+            using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+            {
+                try
+                {
+                    List<Error> errors = new List<Error>();
+                    //List<UsuarioDTO> response = db.Usuarios.Select(u => new UsuarioDTO(u)).ToList();
+                    List<Tarea> response = db.Tareas.Where(u => u.IdTarea == idTarea).ToList();
+                    if (response.Count == 0)
+                    {
+                        return NotFound(new Response()
+                        {
+                            Data = response,
+                            Errors = new List<Error>()
+                            {
+                                new Error()
+                                {
+                                    Id = 1,
+                                    Status = "Not Found",
+                                    Code = 404 ,
+                                    Title = "No Data Found",
+                                    Detail = "There is no data on database"
+                                }
+                            }
+                        });
+                    }
+                    else
+                    {
+                        return Ok(new Response() { Data = response });
+                    }
+                }
+                catch (Exception err)
+                {
+                    Response response = new Response();
+                    response.Errors.Add(new Error()
+                    {
+                        Id = 1,
+                        Status = "Internal Server Error",
+                        Code = 500,
+                        Title = err.Message,
+                        Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                    });
+                    return StatusCode(500, response);
+                }
+            }
+        }
+
+
         [HttpPost]
         [Route("add")]
         public async Task<IActionResult>AddTask([FromBody] Tarea newTareaToAdd) 

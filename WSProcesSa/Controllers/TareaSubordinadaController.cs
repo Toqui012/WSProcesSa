@@ -275,7 +275,7 @@ namespace WSProcesSa.Controllers
         }
 
         [HttpDelete]
-        [Route("delete/id")]
+        [Route("delete/{id}")]
         public async Task<IActionResult> DeleteTaskSubordinada(int id) 
         {
             try
