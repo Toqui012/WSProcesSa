@@ -599,5 +599,80 @@ namespace WSProcesSa.Controllers
                 return StatusCode(500, response);
             }
         }
+
+        [HttpPut]
+        [Route("acceptTask/{idTask}")]
+        public async Task<IActionResult> acceptTask(int idTask) 
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    List<Error> errors = new List<Error>();
+                    //Tarea que yo quiero editar
+                    Tarea taskUpdated = db.Tareas.FirstOrDefault(t => t.IdTarea == idTask);
+
+                    if (taskUpdated != null)
+                    {
+                        if (idTask < 0)
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'IdTask'",
+                                Detail = "The Field 'FkPrioridadTarea' can't be less than 0"
+                            });
+                        }
+                        else
+                        {
+                            //Historial de Estado de tarea
+                            //1 = Creada
+                            //2 = Asignada
+                            //3 = Aceptada
+                            //4 = Rechazada
+                            taskUpdated.FkEstadoTarea = 3;
+                        }
+                        db.SaveChanges();
+                        return Ok(new Response()
+                        {
+                            Data = new TareaDTO(taskUpdated),
+                            Errors = errors
+                        });
+                    }
+                    else
+                    {
+                        return NotFound(new Response()
+                        {
+                            Errors = new List<Error>()
+                            {
+                                new Error()
+                                {
+                                    Id = 1,
+                                    Status = "Not Found",
+                                    Code = 404,
+                                    Title = "No Data Found",
+                                    Detail = "Couldn´t find the Task"
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
     }
 }
