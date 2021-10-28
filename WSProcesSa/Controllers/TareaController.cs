@@ -186,29 +186,6 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
-                        if (string.IsNullOrWhiteSpace(newTareaToAdd.ReporteProblema))
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'ReporteProblema'",
-                                Detail = "The Field 'ReporteProblema' can´t be null or whitespace"
-                            });
-                        }
-
-                        if (string.IsNullOrWhiteSpace(newTareaToAdd.AsignacionTarea))
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'AsignacionTarea'",
-                                Detail = "The Field 'AsignacionTarea' can´t be null or whitespace"
-                            });
-                        }
 
                         if (newTareaToAdd.FkRutUsuario.Length > 12 || newTareaToAdd.FkRutUsuario.Length < 8 || string.IsNullOrWhiteSpace(newTareaToAdd.FkRutUsuario))
                         {
@@ -222,17 +199,6 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
-                        if (newTareaToAdd.FkIdJustificacion < 0)
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'FkIdJustificación'",
-                                Detail = "The Field 'FkIdJustificación' can't be less than 0"
-                            });
-                        }
 
                         if (newTareaToAdd.FkEstadoTarea < 0)
                         {
@@ -266,8 +232,6 @@ namespace WSProcesSa.Controllers
                                 NombreTarea = newTareaToAdd.NombreTarea,
                                 DescripcionTarea = newTareaToAdd.DescripcionTarea,
                                 FechaPlazo = newTareaToAdd.FechaPlazo,
-                                ReporteProblema = newTareaToAdd.ReporteProblema,
-                                AsignacionTarea = newTareaToAdd.AsignacionTarea,
                                 FkRutUsuario = newTareaToAdd.FkRutUsuario,
                                 FkIdJustificacion = newTareaToAdd.FkIdJustificacion,
                                 FkEstadoTarea = newTareaToAdd.FkEstadoTarea,
@@ -459,37 +423,6 @@ namespace WSProcesSa.Controllers
                             taskUpdated.FechaPlazo = task.FechaPlazo;
                         }
 
-                        if (string.IsNullOrWhiteSpace(task.ReporteProblema))
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'ReporteProblema'",
-                                Detail = "The Field 'ReporteProblema' can´t be null or whitespace"
-                            });
-                        }
-                        else
-                        {
-                            taskUpdated.ReporteProblema = task.ReporteProblema;
-                        }
-
-                        if (string.IsNullOrWhiteSpace(task.AsignacionTarea))
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'AsignacionTarea'",
-                                Detail = "The Field 'AsignacionTarea' can´t be null or whitespace"
-                            });
-                        }
-                        else
-                        {
-                            taskUpdated.AsignacionTarea = task.AsignacionTarea;
-                        }
 
                         if (task.FkRutUsuario.Length > 12 || task.FkRutUsuario.Length < 8 || string.IsNullOrWhiteSpace(task.FkRutUsuario))
                         {
@@ -507,21 +440,6 @@ namespace WSProcesSa.Controllers
                             taskUpdated.FkRutUsuario = task.FkRutUsuario;
                         }
 
-                        if (task.FkIdJustificacion < 0)
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'FkIdJustificación'",
-                                Detail = "The Field 'FkIdJustificación' can't be less than 0"
-                            });
-                        }
-                        else
-                        {
-                            taskUpdated.FkIdJustificacion = task.FkIdJustificacion;
-                        }
 
                         if (task.FkEstadoTarea < 0)
                         {
@@ -623,6 +541,7 @@ namespace WSProcesSa.Controllers
                         else
                         {
                             taskUpdated.FkRutUsuario = rutUser;
+                            taskUpdated.FkEstadoTarea = 2;
                         }
 
                         db.SaveChanges();

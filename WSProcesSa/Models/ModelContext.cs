@@ -180,7 +180,6 @@ namespace WSProcesSa.Models
                     .HasColumnName("ID_TAREA");
 
                 entity.Property(e => e.AsignacionTarea)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .IsUnicode(false)
                     .ValueGeneratedOnAdd()
@@ -213,6 +212,7 @@ namespace WSProcesSa.Models
                     .HasColumnName("FK_PRIORIDAD_TAREA");
 
                 entity.Property(e => e.FkRutUsuario)
+                    .IsRequired()
                     .HasMaxLength(12)
                     .IsUnicode(false)
                     .ValueGeneratedOnAdd()
@@ -251,6 +251,7 @@ namespace WSProcesSa.Models
                 entity.HasOne(d => d.FkRutUsuarioNavigation)
                     .WithMany(p => p.Tareas)
                     .HasForeignKey(d => d.FkRutUsuario)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_RUT_USUARIO");
             });
 

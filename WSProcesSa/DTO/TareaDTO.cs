@@ -11,10 +11,7 @@ namespace WSProcesSa.DTO
         public string NombreTarea { get; set; }
         public string DescripcionTarea { get; set; }
         public DateTime FechaPlazo { get; set; }
-        public string ReporteProblema { get; set; }
-        public string AsignacionTarea { get; set; }
         public string FkRutUsuario { get; set; }
-        public decimal? FkIdJustificacion { get; set; }
         public decimal FkEstadoTarea { get; set; }
         public decimal FkPrioridadTarea { get; set; }
 
@@ -29,10 +26,7 @@ namespace WSProcesSa.DTO
             this.NombreTarea = tarea.NombreTarea;
             this.DescripcionTarea = tarea.DescripcionTarea;
             this.FechaPlazo = tarea.FechaPlazo;
-            this.ReporteProblema = tarea.ReporteProblema;
-            this.AsignacionTarea = tarea.AsignacionTarea;
             this.FkRutUsuario = tarea.FkRutUsuario;
-            this.FkIdJustificacion = tarea.FkIdJustificacion;
             this.FkEstadoTarea = tarea.FkEstadoTarea;
             this.FkPrioridadTarea = tarea.FkPrioridadTarea;
         }
