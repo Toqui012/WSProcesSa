@@ -706,6 +706,7 @@ namespace WSProcesSa.Controllers
                         return Ok(new Response()
                         {
                             Data = new TareaDTO(taskUpdated),
+
                             Errors = errors
                         });
                     }
