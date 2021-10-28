@@ -9,6 +9,7 @@ namespace WSProcesSa.DTO
     {
         public decimal IdJustificacion { get; set; }
         public string Descripcion { get; set; }
+        public decimal FkTareaId { get; set; }
 
         public JustificacionDTO()
         {
@@ -19,6 +20,7 @@ namespace WSProcesSa.DTO
         {
             this.IdJustificacion = justificacionTarea.IdJustificacion;
             this.Descripcion = justificacionTarea.Descripcion;
+            this.FkTareaId = justificacionTarea.FkIdTarea;
         }
     }
 }

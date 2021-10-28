@@ -10,6 +10,7 @@ namespace WSProcesSa.Models
         public Tarea()
         {
             FlujoTareas = new HashSet<FlujoTarea>();
+            JustificacionTareas = new HashSet<JustificacionTarea>();
             TareaSubordinada = new HashSet<TareaSubordinadum>();
         }
 
@@ -29,6 +30,7 @@ namespace WSProcesSa.Models
         public virtual PrioridadTarea FkPrioridadTareaNavigation { get; set; }
         public virtual Usuario FkRutUsuarioNavigation { get; set; }
         public virtual ICollection<FlujoTarea> FlujoTareas { get; set; }
+        public virtual ICollection<JustificacionTarea> JustificacionTareas { get; set; }
         public virtual ICollection<TareaSubordinadum> TareaSubordinada { get; set; }
     }
 }

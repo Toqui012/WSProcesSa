@@ -33,6 +33,7 @@ namespace WSProcesSa.Models
         public virtual DbSet<Usuario> Usuarios { get; set; }
         private string ConnectionString { get; set; }
 
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -119,6 +120,16 @@ namespace WSProcesSa.Models
                     .IsUnicode(false)
                     .ValueGeneratedOnAdd()
                     .HasColumnName("DESCRIPCION");
+
+                entity.Property(e => e.FkIdTarea)
+                    .HasColumnType("NUMBER")
+                    .HasColumnName("FK_ID_TAREA");
+
+                entity.HasOne(d => d.FkIdTareaNavigation)
+                    .WithMany(p => p.JustificacionTareas)
+                    .HasForeignKey(d => d.FkIdTarea)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_JUSTIFICACION_TAREA_ID");
             });
 
             modelBuilder.Entity<PrioridadTarea>(entity =>
