@@ -77,14 +77,16 @@ namespace WSProcesSa.Controllers
         }
 
         [HttpPost]
-        [Route("add")]
-        public async Task<IActionResult> AddJustificacionTarea([FromBody] JustificacionTarea newJustificacionToAdd)
+        [Route("add/{idTask}")]
+        public async Task<IActionResult> AddJustificacionTarea(int idTask,[FromBody] JustificacionTarea newJustificacionToAdd)
         {
             using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
             {
                 try
                 {
                     List<Error> errors = new List<Error>();
+                    Tarea taskUpdated = db.Tareas.FirstOrDefault(t => t.IdTarea == idTask);
+
                     if (!db.JustificacionTareas.Any(task => task.IdJustificacion == newJustificacionToAdd.IdJustificacion))
                     {
                         if (string.IsNullOrWhiteSpace(newJustificacionToAdd.Descripcion))
@@ -99,19 +101,42 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
+                        if (idTask < 0)
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'FkIdTarea'",
+                                Detail = "The Field 'FkIdTarea' cannot be less 0"
+                            });
+                        }
+
+                      
+
                         if (errors.Count == 0)
                         {
                             JustificacionTarea justificacionTarea = new JustificacionTarea()
                             {
-                                Descripcion = newJustificacionToAdd.Descripcion
+                                Descripcion = newJustificacionToAdd.Descripcion,
+                                FkIdTarea = idTask,
                             };
 
                             db.JustificacionTareas.Add(justificacionTarea);
+                            db.SaveChanges();
+                            if (taskUpdated != null)
+                            {
+                                taskUpdated.FkEstadoTarea = 4;
+                                taskUpdated.FkIdJustificacion = justificacionTarea.IdJustificacion;
+                            }
                             db.SaveChanges();
                             return Created($"/detail/{newJustificacionToAdd.IdJustificacion}", new Response()
                             {
                                 Data = new JustificacionDTO(justificacionTarea)
                             });
+
+
                         }
                         else
                         {
@@ -239,6 +264,7 @@ namespace WSProcesSa.Controllers
                         {
                             justificacionTareaUpdated.Descripcion = justificacionTarea.Descripcion;
                         }
+
 
                         db.SaveChanges();
 

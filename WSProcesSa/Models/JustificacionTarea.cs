@@ -14,7 +14,9 @@ namespace WSProcesSa.Models
 
         public decimal IdJustificacion { get; set; }
         public string Descripcion { get; set; }
+        public decimal FkIdTarea { get; set; }
 
+        public virtual Tarea FkIdTareaNavigation { get; set; }
         public virtual ICollection<Tarea> Tareas { get; set; }
     }
 }
