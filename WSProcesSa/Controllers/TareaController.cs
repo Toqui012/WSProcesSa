@@ -232,7 +232,7 @@ namespace WSProcesSa.Controllers
                                 NombreTarea = newTareaToAdd.NombreTarea,
                                 DescripcionTarea = newTareaToAdd.DescripcionTarea,
                                 FechaPlazo = newTareaToAdd.FechaPlazo,
-                                FkRutUsuario = newTareaToAdd.FkRutUsuario,
+                                FkRutUsuario = "0.000.000",
                                 FkIdJustificacion = newTareaToAdd.FkIdJustificacion,
                                 FkEstadoTarea = newTareaToAdd.FkEstadoTarea,
                                 FkPrioridadTarea = newTareaToAdd.FkPrioridadTarea,
@@ -351,7 +351,7 @@ namespace WSProcesSa.Controllers
         {
             try
             {
-                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                using ( ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
                 {
                     List<Error> errors = new List<Error>();
                     Tarea taskUpdated = db.Tareas.Where(f => f.IdTarea == id).FirstOrDefault();
