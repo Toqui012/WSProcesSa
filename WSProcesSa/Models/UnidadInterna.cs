@@ -15,7 +15,9 @@ namespace WSProcesSa.Models
         public decimal IdUnidadInterna { get; set; }
         public string NombreUnidad { get; set; }
         public string DescripcionUnidad { get; set; }
+        public string FkRutEmpresa { get; set; }
 
+        public virtual Empresa FkRutEmpresaNavigation { get; set; }
         public virtual ICollection<Usuario> Usuarios { get; set; }
     }
 }

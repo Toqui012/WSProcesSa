@@ -22,6 +22,7 @@ namespace WSProcesSa.Models
             this.ConnectionString = connectionString;
         }
 
+        public virtual DbSet<Empresa> Empresas { get; set; }
         public virtual DbSet<EstadoTarea> EstadoTareas { get; set; }
         public virtual DbSet<FlujoTarea> FlujoTareas { get; set; }
         public virtual DbSet<JustificacionTarea> JustificacionTareas { get; set; }
@@ -32,7 +33,6 @@ namespace WSProcesSa.Models
         public virtual DbSet<UnidadInterna> UnidadInternas { get; set; }
         public virtual DbSet<Usuario> Usuarios { get; set; }
         private string ConnectionString { get; set; }
-
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -48,10 +48,50 @@ namespace WSProcesSa.Models
             modelBuilder.HasDefaultSchema("PORTAFOLIO")
                 .HasAnnotation("Relational:Collation", "USING_NLS_COMP");
 
+            modelBuilder.Entity<Empresa>(entity =>
+            {
+                entity.HasKey(e => e.RutEmpresa)
+                    .HasName("SYS_C0011556");
+
+                entity.ToTable("EMPRESA");
+
+                entity.Property(e => e.RutEmpresa)
+                    .HasMaxLength(12)
+                    .IsUnicode(false)
+                    .HasColumnName("RUT_EMPRESA");
+
+                entity.Property(e => e.CorreoElectronicoEmpresa)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false)
+                    .HasColumnName("CORREO_ELECTRONICO_EMPRESA");
+
+                entity.Property(e => e.DireccionEmpresa)
+                    .HasMaxLength(255)
+                    .IsUnicode(false)
+                    .HasColumnName("DIRECCION_EMPRESA");
+
+                entity.Property(e => e.GiroEmpresa)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false)
+                    .HasColumnName("GIRO_EMPRESA");
+
+                entity.Property(e => e.NumberoTelefono)
+                    .HasColumnType("NUMBER(38)")
+                    .HasColumnName("NUMBERO_TELEFONO");
+
+                entity.Property(e => e.RazonSocial)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false)
+                    .HasColumnName("RAZON_SOCIAL");
+            });
+
             modelBuilder.Entity<EstadoTarea>(entity =>
             {
                 entity.HasKey(e => e.IdEstadoTarea)
-                    .HasName("SYS_C0010500");
+                    .HasName("SYS_C0011558");
 
                 entity.ToTable("ESTADO_TAREA");
 
@@ -70,7 +110,7 @@ namespace WSProcesSa.Models
             modelBuilder.Entity<FlujoTarea>(entity =>
             {
                 entity.HasKey(e => e.IdFlujoTarea)
-                    .HasName("SYS_C0010542");
+                    .HasName("SYS_C0011607");
 
                 entity.ToTable("FLUJO_TAREA");
 
@@ -106,7 +146,7 @@ namespace WSProcesSa.Models
             modelBuilder.Entity<JustificacionTarea>(entity =>
             {
                 entity.HasKey(e => e.IdJustificacion)
-                    .HasName("SYS_C0010505");
+                    .HasName("SYS_C0011563");
 
                 entity.ToTable("JUSTIFICACION_TAREA");
 
@@ -135,7 +175,7 @@ namespace WSProcesSa.Models
             modelBuilder.Entity<PrioridadTarea>(entity =>
             {
                 entity.HasKey(e => e.IdPrioridad)
-                    .HasName("SYS_C0010503");
+                    .HasName("SYS_C0011561");
 
                 entity.ToTable("PRIORIDAD_TAREA");
 
@@ -181,7 +221,7 @@ namespace WSProcesSa.Models
             modelBuilder.Entity<Tarea>(entity =>
             {
                 entity.HasKey(e => e.IdTarea)
-                    .HasName("SYS_C0010526");
+                    .HasName("SYS_C0011591");
 
                 entity.ToTable("TAREA");
 
@@ -196,11 +236,22 @@ namespace WSProcesSa.Models
                     .ValueGeneratedOnAdd()
                     .HasColumnName("ASIGNACION_TAREA");
 
+                entity.Property(e => e.CreadaPor)
+                    .HasMaxLength(255)
+                    .IsUnicode(false)
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("CREADA_POR");
+
                 entity.Property(e => e.DescripcionTarea)
                     .HasMaxLength(255)
                     .IsUnicode(false)
                     .ValueGeneratedOnAdd()
                     .HasColumnName("DESCRIPCION_TAREA");
+
+                entity.Property(e => e.FechaCreacion)
+                    .HasColumnType("DATE")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("FECHA_CREACION");
 
                 entity.Property(e => e.FechaPlazo)
                     .HasColumnType("DATE")
@@ -223,7 +274,6 @@ namespace WSProcesSa.Models
                     .HasColumnName("FK_PRIORIDAD_TAREA");
 
                 entity.Property(e => e.FkRutUsuario)
-                    .IsRequired()
                     .HasMaxLength(12)
                     .IsUnicode(false)
                     .ValueGeneratedOnAdd()
@@ -235,6 +285,12 @@ namespace WSProcesSa.Models
                     .IsUnicode(false)
                     .ValueGeneratedOnAdd()
                     .HasColumnName("NOMBRE_TAREA");
+
+                entity.Property(e => e.PorcentajeAvance)
+                    .HasColumnType("NUMBER(38)")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("PORCENTAJE_AVANCE")
+                    .HasDefaultValueSql("NULL");
 
                 entity.Property(e => e.ReporteProblema)
                     .HasMaxLength(255)
@@ -262,14 +318,13 @@ namespace WSProcesSa.Models
                 entity.HasOne(d => d.FkRutUsuarioNavigation)
                     .WithMany(p => p.Tareas)
                     .HasForeignKey(d => d.FkRutUsuario)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_RUT_USUARIO");
             });
 
             modelBuilder.Entity<TareaSubordinadum>(entity =>
             {
                 entity.HasKey(e => e.IdTareaSubordinada)
-                    .HasName("SYS_C0010536");
+                    .HasName("SYS_C0011601");
 
                 entity.ToTable("TAREA_SUBORDINADA");
 
@@ -328,7 +383,7 @@ namespace WSProcesSa.Models
             modelBuilder.Entity<UnidadInterna>(entity =>
             {
                 entity.HasKey(e => e.IdUnidadInterna)
-                    .HasName("SYS_C0010498");
+                    .HasName("SYS_C0011567");
 
                 entity.ToTable("UNIDAD_INTERNA");
 
@@ -343,18 +398,31 @@ namespace WSProcesSa.Models
                     .ValueGeneratedOnAdd()
                     .HasColumnName("DESCRIPCION_UNIDAD");
 
+                entity.Property(e => e.FkRutEmpresa)
+                    .IsRequired()
+                    .HasMaxLength(12)
+                    .IsUnicode(false)
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("FK_RUT_EMPRESA");
+
                 entity.Property(e => e.NombreUnidad)
                     .IsRequired()
                     .HasMaxLength(200)
                     .IsUnicode(false)
                     .ValueGeneratedOnAdd()
                     .HasColumnName("NOMBRE_UNIDAD");
+
+                entity.HasOne(d => d.FkRutEmpresaNavigation)
+                    .WithMany(p => p.UnidadInternas)
+                    .HasForeignKey(d => d.FkRutEmpresa)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_UNIDAD_INTERNA_EMPRESA");
             });
 
             modelBuilder.Entity<Usuario>(entity =>
             {
                 entity.HasKey(e => e.RutUsuario)
-                    .HasName("SYS_C0010516");
+                    .HasName("SYS_C0011579");
 
                 entity.ToTable("USUARIO");
 
@@ -428,19 +496,27 @@ namespace WSProcesSa.Models
 
             modelBuilder.HasSequence("ESTADO_TAREA_SEQ1");
 
+            modelBuilder.HasSequence("ESTADO_TAREA_SEQ2");
+
             modelBuilder.HasSequence("FLUJO_TAREA_SEQ");
 
             modelBuilder.HasSequence("FLUJO_TAREA_SEQ1");
 
             modelBuilder.HasSequence("FLUJO_TAREA_SEQ2");
 
+            modelBuilder.HasSequence("FLUJO_TAREA_SEQ3");
+
             modelBuilder.HasSequence("JUSTIFICACION_TAREA_SEQ");
 
             modelBuilder.HasSequence("JUSTIFICACION_TAREA_SEQ1");
 
+            modelBuilder.HasSequence("JUSTIFICACION_TAREA_SEQ2");
+
             modelBuilder.HasSequence("PRIORIDAD_TAREA_SEQ");
 
             modelBuilder.HasSequence("PRIORIDAD_TAREA_SEQ1");
+
+            modelBuilder.HasSequence("PRIORIDAD_TAREA_SEQ2");
 
             modelBuilder.HasSequence("ROL_SEQ");
 
@@ -452,13 +528,19 @@ namespace WSProcesSa.Models
 
             modelBuilder.HasSequence("TAREA_SEQ1");
 
+            modelBuilder.HasSequence("TAREA_SEQ2");
+
             modelBuilder.HasSequence("TAREA_SUBORDINADA_SEQ");
 
             modelBuilder.HasSequence("TAREA_SUBORDINADA_SEQ1");
 
+            modelBuilder.HasSequence("TAREA_SUBORDINADA_SEQ2");
+
             modelBuilder.HasSequence("UNIDAD_INTERNA_SEQ");
 
             modelBuilder.HasSequence("UNIDAD_INTERNA_SEQ1");
+
+            modelBuilder.HasSequence("UNIDAD_INTERNA_SEQ2");
 
             modelBuilder.HasSequence("USUARIO_SEQ");
 

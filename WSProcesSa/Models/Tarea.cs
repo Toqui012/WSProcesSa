@@ -20,6 +20,9 @@ namespace WSProcesSa.Models
         public DateTime FechaPlazo { get; set; }
         public string ReporteProblema { get; set; }
         public string AsignacionTarea { get; set; }
+        public decimal PorcentajeAvance { get; set; }
+        public DateTime FechaCreacion { get; set; }
+        public string CreadaPor { get; set; }
         public string FkRutUsuario { get; set; }
         public decimal? FkIdJustificacion { get; set; }
         public decimal FkEstadoTarea { get; set; }
