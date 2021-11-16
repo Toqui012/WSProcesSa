@@ -16,7 +16,7 @@ namespace WSProcesSa.Models
         public string RazonSocial { get; set; }
         public string GiroEmpresa { get; set; }
         public string DireccionEmpresa { get; set; }
-        public decimal NumberoTelefono { get; set; }
+        public decimal NumeroTelefono { get; set; }
         public string CorreoElectronicoEmpresa { get; set; }
 
         public virtual ICollection<UnidadInterna> UnidadInternas { get; set; }

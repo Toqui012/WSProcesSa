@@ -26,7 +26,7 @@ namespace WSProcesSa.DTO
             this.RazonSocial = business.RazonSocial;
             this.GiroEmpresa = business.GiroEmpresa;
             this.DireccionEmpresa = business.DireccionEmpresa;
-            this.NumberoTelefono = business.NumberoTelefono;
+            this.NumberoTelefono = business.NumeroTelefono;
             this.CorreoElectronicoEmpresa = business.CorreoElectronicoEmpresa;
         }
     }

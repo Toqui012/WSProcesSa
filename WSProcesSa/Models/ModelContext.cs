@@ -77,9 +77,9 @@ namespace WSProcesSa.Models
                     .IsUnicode(false)
                     .HasColumnName("GIRO_EMPRESA");
 
-                entity.Property(e => e.NumberoTelefono)
+                entity.Property(e => e.NumeroTelefono)
                     .HasColumnType("NUMBER(38)")
-                    .HasColumnName("NUMBERO_TELEFONO");
+                    .HasColumnName("NUMERO_TELEFONO");
 
                 entity.Property(e => e.RazonSocial)
                     .IsRequired()

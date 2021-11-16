@@ -136,7 +136,7 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
-                        if (newEmpresa.NumberoTelefono != 9)
+                        if (newEmpresa.NumeroTelefono != 9)
                         {
                             errors.Add(new Error()
                             {
@@ -168,7 +168,7 @@ namespace WSProcesSa.Controllers
                                 RazonSocial = newEmpresa.RazonSocial,
                                 GiroEmpresa = newEmpresa.GiroEmpresa,
                                 DireccionEmpresa = newEmpresa.DireccionEmpresa,
-                                NumberoTelefono = newEmpresa.NumberoTelefono,
+                                NumeroTelefono = newEmpresa.NumeroTelefono,
                                 CorreoElectronicoEmpresa = newEmpresa.CorreoElectronicoEmpresa,
                             };
 
@@ -351,9 +351,9 @@ namespace WSProcesSa.Controllers
                             businessUpdated.DireccionEmpresa = business.DireccionEmpresa;
                         }
 
-                        if (business.NumberoTelefono == 9)
+                        if (business.NumeroTelefono == 9)
                         {
-                            businessUpdated.NumberoTelefono = business.NumberoTelefono;
+                            businessUpdated.NumeroTelefono = business.NumeroTelefono;
                         }
                         else
                         {
