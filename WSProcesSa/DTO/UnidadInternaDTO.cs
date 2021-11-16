@@ -11,6 +11,8 @@ namespace WSProcesSa.DTO
         public string NombreUnidad { get; set; }
         public string DescripcionUnidad { get; set; }
 
+        public string FkRutEmpresa { get; set; }
+
         public UnidadInternaDTO() 
         {
 
@@ -20,6 +22,7 @@ namespace WSProcesSa.DTO
         {
             this.IdUnidadInterna = unidadInterna.IdUnidadInterna;
             this.NombreUnidad = unidadInterna.NombreUnidad;
+            this.FkRutEmpresa = unidadInterna.FkRutEmpresa;
             this.DescripcionUnidad = unidadInterna.DescripcionUnidad;
         }
 

@@ -136,7 +136,7 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
-                        if (newEmpresa.NumeroTelefono != 9)
+                        if (newEmpresa.NumeroTelefono < 9)
                         {
                             errors.Add(new Error()
                             {

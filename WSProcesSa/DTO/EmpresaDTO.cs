@@ -12,7 +12,7 @@ namespace WSProcesSa.DTO
         public string RazonSocial { get; set; }
         public string GiroEmpresa { get; set; }
         public string DireccionEmpresa { get; set; }
-        public decimal NumberoTelefono { get; set; }
+        public decimal NumeroTelefono { get; set; }
         public string CorreoElectronicoEmpresa { get; set; }
 
         public EmpresaDTO()
@@ -26,7 +26,7 @@ namespace WSProcesSa.DTO
             this.RazonSocial = business.RazonSocial;
             this.GiroEmpresa = business.GiroEmpresa;
             this.DireccionEmpresa = business.DireccionEmpresa;
-            this.NumberoTelefono = business.NumeroTelefono;
+            this.NumeroTelefono = business.NumeroTelefono;
             this.CorreoElectronicoEmpresa = business.CorreoElectronicoEmpresa;
         }
     }

@@ -99,6 +99,7 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
+
                         if (string.IsNullOrWhiteSpace(newUnidadInternaToAdd.NombreUnidad))
                         {
                             errors.Add(new Error()
@@ -121,6 +122,7 @@ namespace WSProcesSa.Controllers
                             UnidadInterna unidadInternaToAdd = new UnidadInterna()
                             {
                                 NombreUnidad = newUnidadInternaToAdd.NombreUnidad,
+                                FkRutEmpresa = newUnidadInternaToAdd.FkRutEmpresa,
                                 DescripcionUnidad = newUnidadInternaToAdd.DescripcionUnidad,
                             };
 
