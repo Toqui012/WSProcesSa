@@ -185,7 +185,7 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
-                        if (newEmpresa.NumeroTelefono < 9)
+                        if (newEmpresa.NumeroTelefono.ToString().Length < 9)
                         {
                             errors.Add(new Error()
                             {
@@ -347,21 +347,6 @@ namespace WSProcesSa.Controllers
 
                     if (businessUpdated != null)
                     {
-                        if (!string.IsNullOrWhiteSpace(business.RutEmpresa))
-                        {
-                            businessUpdated.RutEmpresa = business.RutEmpresa;
-                        }
-                        else
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid field: RutEmpresa",
-                                Detail = "The field 'RutEmpresa'does not contain the required format."
-                            });
-                        }
 
                         if (!string.IsNullOrWhiteSpace(business.RazonSocial))
                         {
@@ -400,7 +385,7 @@ namespace WSProcesSa.Controllers
                             businessUpdated.DireccionEmpresa = business.DireccionEmpresa;
                         }
 
-                        if (business.NumeroTelefono == 9)
+                        if (business.NumeroTelefono.ToString().Length >= 9)
                         {
                             businessUpdated.NumeroTelefono = business.NumeroTelefono;
                         }

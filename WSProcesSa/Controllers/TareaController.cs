@@ -186,6 +186,19 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
+                        // Dennisse
+                        if (string.IsNullOrWhiteSpace(newTareaToAdd.CreadaPor))
+						{
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'FechaPlazo'",
+                                Detail = "The Field 'CreadaPor' can´t be null or whitespace"
+                            });
+                        }
+
 
                         if (newTareaToAdd.FkRutUsuario.Length > 12 || newTareaToAdd.FkRutUsuario.Length < 8 || string.IsNullOrWhiteSpace(newTareaToAdd.FkRutUsuario))
                         {
@@ -195,20 +208,7 @@ namespace WSProcesSa.Controllers
                                 Status = "Bad Request",
                                 Code = 400,
                                 Title = "Invalid Field 'RutUsuario'",
-                                Detail = "The Field 'RutUsuarop' can't be null or white space"
-                            });
-                        }
-
-
-                        if (newTareaToAdd.FkEstadoTarea < 0)
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'FkEstadoTarea'",
-                                Detail = "The Field 'FkIdEstadoTarea' can't be less than 0"
+                                Detail = "The Field 'RutUsuarip' can't be null or white space"
                             });
                         }
 
@@ -232,9 +232,12 @@ namespace WSProcesSa.Controllers
                                 NombreTarea = newTareaToAdd.NombreTarea,
                                 DescripcionTarea = newTareaToAdd.DescripcionTarea,
                                 FechaPlazo = newTareaToAdd.FechaPlazo,
+                                PorcentajeAvance = 1,
+                                FechaCreacion = DateTime.Now,
+                                CreadaPor = newTareaToAdd.CreadaPor,
                                 FkRutUsuario = "0.000.000",
                                 FkIdJustificacion = newTareaToAdd.FkIdJustificacion,
-                                FkEstadoTarea = newTareaToAdd.FkEstadoTarea,
+                                FkEstadoTarea = 1,
                                 FkPrioridadTarea = newTareaToAdd.FkPrioridadTarea,
                             };
 
@@ -359,22 +362,6 @@ namespace WSProcesSa.Controllers
                     {
                         task.FechaPlazo = DateTime.Parse(task.FechaPlazo.ToString("dd/MM/yyyy"));
 
-                        if (task.IdTarea < 0)
-                        {
-                            errors.Add(new Error()
-                            {
-                                Id = errors.Count + 1,
-                                Status = "Bad Request",
-                                Code = 400,
-                                Title = "Invalid Field 'IdTarea'",
-                                Detail = "The Field 'IdTarea' cannot be less than 0"
-                            });
-                        }
-                        else
-                        {
-                            taskUpdated.IdTarea = task.IdTarea;
-                        }
-
                         if (string.IsNullOrWhiteSpace(task.NombreTarea))
                         {
                             errors.Add(new Error()
@@ -423,6 +410,22 @@ namespace WSProcesSa.Controllers
                             taskUpdated.FechaPlazo = task.FechaPlazo;
                         }
 
+                        // Dennisse
+                        if (task.PorcentajeAvance < 0 || task.PorcentajeAvance > 100)
+						{
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'DescripcionTarea'",
+                                Detail = "The Field 'PorcentajeAvance can´t be less than 0 and greater than 100"
+                            });
+                        } 
+                        else
+						{
+                            taskUpdated.PorcentajeAvance = task.PorcentajeAvance;
+						}
 
                         if (task.FkRutUsuario.Length > 12 || task.FkRutUsuario.Length < 8 || string.IsNullOrWhiteSpace(task.FkRutUsuario))
                         {
