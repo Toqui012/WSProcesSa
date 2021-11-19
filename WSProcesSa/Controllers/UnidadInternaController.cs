@@ -112,6 +112,19 @@ namespace WSProcesSa.Controllers
                             });
                         }
 
+                        // Dennisse
+                        if(string.IsNullOrWhiteSpace(newUnidadInternaToAdd.FkRutEmpresa))
+						{
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'NombreUnidadInterna'",
+                                Detail = "The field 'FkRutEmpresa' can't be null or white space"
+                            });
+                        }
+
                         if (string.IsNullOrWhiteSpace(newUnidadInternaToAdd.DescripcionUnidad))
                         {
                             newUnidadInternaToAdd.DescripcionUnidad = string.Empty;
