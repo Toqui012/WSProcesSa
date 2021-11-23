@@ -45,7 +45,7 @@ namespace WSProcesSa.Services
                 {
                     userResponse.Email = user.CorreoElectronico;
                     userResponse.Role = user.IdRolUsuario;
-                    userResponse.Nombre = user.NombreUsuario;
+                    userResponse.Nombre = user.NombreUsuario; 
                     userResponse.PrimerApellido = user.ApellidoUsuario;
                     userResponse.Token = GetToken(user);
                     return userResponse;
@@ -71,7 +71,7 @@ namespace WSProcesSa.Services
                     new Claim(ClaimTypes.NameIdentifier, user.RutUsuario),
                     new Claim(ClaimTypes.Email, user.CorreoElectronico),
                     new Claim(ClaimTypes.Role, user.IdRolUsuario.ToString()),
-                    new Claim(ClaimTypes.Name, user.NombreUsuario),
+                    new Claim(ClaimTypes.Name, user.NombreUsuario+" "+user.ApellidoUsuario),
                 }),
                 Expires = DateTime.UtcNow.AddDays(60), 
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
