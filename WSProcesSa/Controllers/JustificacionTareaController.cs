@@ -36,7 +36,7 @@ namespace WSProcesSa.Controllers
             {
                 try
                 {
-                    List<JustificacionDTO> response = db.JustificacionTareas.Select(x => new JustificacionDTO(x)).ToList();
+                    List<JustificacionDTO> response = db.JustificacionTareas.Select(justificacion => new JustificacionDTO(justificacion)).ToList();
                     if (response.Count == 0)
                     {
                         return NotFound(new Response()
