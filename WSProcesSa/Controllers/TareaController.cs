@@ -821,9 +821,144 @@ namespace WSProcesSa.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("getTaskInProcess")]
+        public async Task<IActionResult> GetTaskInProcess()
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    //Se Obtiene el listado de tareas con el estado de tareas Aceptado
+                    int response = db.Tareas.Where(t => t.FkEstadoTarea == 3).Count();
+                    return Ok(new Response() { Data = response });
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
 
+        [HttpGet]
+        [Route("getFinishTask")]
+        public async Task<IActionResult> GetFinishTask()
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    //Se Obtiene el listado de tareas con el estado de tareas Aceptado
+                    int response = db.Tareas.Where(t => t.FkEstadoTarea == 5).Count();
+                    return Ok(new Response() { Data = response });
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
 
+        [HttpGet]
+        [Route("getRejectTask")]
+        public async Task<IActionResult> GetRejectTask()
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    //Se Obtiene el listado de tareas con el estado de tareas Aceptado
+                    int response = db.Tareas.Where(t => t.FkEstadoTarea == 4).Count();
+                   return Ok(new Response() { Data = response });
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
 
+        [HttpGet]
+        [Route("getTaskCreated")]
+        public async Task<IActionResult> GetTaskCreated()
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    //Se Obtiene el listado de tareas con el estado de tareas Aceptado
+                    int response = db.Tareas.Where(t => t.FkEstadoTarea == 1).Count();
+                       return Ok(new Response() { Data = response });
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
 
+        [HttpGet]
+        [Route("getAssignedTask")]
+        public async Task<IActionResult> GetAssignedTask()
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    //Se Obtiene el listado de tareas con el estado de tareas Aceptado
+                    int response = db.Tareas.Where(t => t.FkEstadoTarea == 2).Count();
+                    return Ok(new Response() { Data = response });
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
     }
 }
