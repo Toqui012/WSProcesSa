@@ -881,5 +881,68 @@ namespace WSProcesSa.Controllers
                 return StatusCode(500, response);
             }
         }
+
+        [HttpGet]
+        [Route("getOverdureTask")]
+        public async Task<IActionResult> GetOverdureTask()
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    //Se Obtiene el listado de tareas con el estado de tareas Aceptado
+                    int response = db.Tareas.Where(t => t.FkEstadoTarea == 6).Count();
+                    return Ok(new Response() { Data = response });
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
+
+        [HttpPost]
+        [Route("listenToDelayedTask")]
+        public async Task<IActionResult> listenToDelayedTask()
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    // Se obtiene el listado de las tareas con su respectivas fechas de plazo
+                    List<Tarea> response = db.Tareas.Where(t => t.FechaPlazo < DateTime.Today).ToList();
+
+                    foreach (var i in response)
+                    {
+                        i.FkEstadoTarea = 6;
+                        db.SaveChanges();
+                    }
+                    return Ok(new Response() { Data = "Successful operation"});
+                }
+
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Inernal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
     }
 }
