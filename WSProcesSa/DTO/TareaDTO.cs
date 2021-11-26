@@ -18,9 +18,6 @@ namespace WSProcesSa.DTO
         public decimal FkEstadoTarea { get; set; }
         public decimal FkPrioridadTarea { get; set; }
 
-        public TareaDTO()
-        {
-
         public TareaDTO(Models.Tarea tarea)
         {
             this.IdTarea = tarea.IdTarea;
@@ -34,5 +31,6 @@ namespace WSProcesSa.DTO
             this.FkEstadoTarea = tarea.FkEstadoTarea;
             this.FkPrioridadTarea = tarea.FkPrioridadTarea;
         }
+
     }
 }
