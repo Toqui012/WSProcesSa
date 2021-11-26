@@ -21,8 +21,6 @@ namespace WSProcesSa.DTO
         public TareaDTO()
         {
 
-        }
-
         public TareaDTO(Models.Tarea tarea)
         {
             this.IdTarea = tarea.IdTarea;

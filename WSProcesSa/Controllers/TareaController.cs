@@ -11,6 +11,7 @@ using WSProcesSa.Controllers;
 using WSProcesSa.Models;
 using WSProcesSa.DTO;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace WSProcesSa.Controllers
 {
@@ -943,6 +944,37 @@ namespace WSProcesSa.Controllers
                 {
                     //Se Obtiene el listado de tareas con el estado de tareas Aceptado
                     int response = db.Tareas.Where(t => t.FkEstadoTarea == 2).Count();
+                    return Ok(new Response() { Data = response });
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
+        [HttpGet]
+        [Route("getNotificarionTask")]
+        public async Task<IActionResult> GetNotificarionTask()
+        {
+            try 
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+
+                    //Se Obtiene el listado de tareas con fecha pronta a vencer en 5 dias.
+
+                    DateTime newTime = DateTime.Now.AddDays(5);
+                    List<Tarea> response = db.Tareas.Where(f => f.FechaPlazo <= newTime).ToList();
+
                     return Ok(new Response() { Data = response });
                 }
             }
