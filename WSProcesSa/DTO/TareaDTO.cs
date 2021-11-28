@@ -19,10 +19,6 @@ namespace WSProcesSa.DTO
         public decimal FkPrioridadTarea { get; set; }
         public string ReporteProblema { get; set; }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 6d588e91ceb2d5b000724c717c9dc35ee45d851f
         public TareaDTO(Models.Tarea tarea)
         {
             this.IdTarea = tarea.IdTarea;
