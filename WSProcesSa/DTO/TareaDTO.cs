@@ -17,9 +17,8 @@ namespace WSProcesSa.DTO
         public string FkRutUsuario { get; set; }
         public decimal FkEstadoTarea { get; set; }
         public decimal FkPrioridadTarea { get; set; }
+        public string ReporteProblema { get; set; }
 
-        public TareaDTO()
-        {
 
         public TareaDTO(Models.Tarea tarea)
         {
@@ -33,6 +32,7 @@ namespace WSProcesSa.DTO
             this.FkRutUsuario = tarea.FkRutUsuario;
             this.FkEstadoTarea = tarea.FkEstadoTarea;
             this.FkPrioridadTarea = tarea.FkPrioridadTarea;
+            this.ReporteProblema = tarea.ReporteProblema;
         }
     }
 }
