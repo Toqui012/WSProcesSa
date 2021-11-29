@@ -11,7 +11,6 @@ using WSProcesSa.Controllers;
 using WSProcesSa.Models;
 using WSProcesSa.DTO;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 
 namespace WSProcesSa.Controllers
 {
