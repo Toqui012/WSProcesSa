@@ -959,7 +959,6 @@ namespace WSProcesSa.Controllers
                 return StatusCode(500, response);
             }
         }
-----------
         [HttpGet]
         [Route("getNotificarionTask")]
         public async Task<IActionResult> GetNotificarionTask()
@@ -991,7 +990,6 @@ namespace WSProcesSa.Controllers
                 return StatusCode(500, response);
             }
         }
-----------
 
         // Agregar reporte problema
         [HttpPut]
