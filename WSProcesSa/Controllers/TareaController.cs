@@ -235,7 +235,7 @@ namespace WSProcesSa.Controllers
                                 PorcentajeAvance = 1,
                                 FechaCreacion = DateTime.Now,
                                 CreadaPor = newTareaToAdd.CreadaPor,
-                                FkRutUsuario = "0.000.000",
+                                FkRutUsuario = newTareaToAdd.FkRutUsuario,
                                 FkIdJustificacion = newTareaToAdd.FkIdJustificacion,
                                 FkEstadoTarea = 1,
                                 FkPrioridadTarea = newTareaToAdd.FkPrioridadTarea,
@@ -1127,5 +1127,11 @@ namespace WSProcesSa.Controllers
                 return StatusCode(500, response);
             }
         }
+
+
+        
+
+
+
     }
 }
