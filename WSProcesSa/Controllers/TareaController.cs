@@ -11,7 +11,6 @@ using WSProcesSa.Controllers;
 using WSProcesSa.Models;
 using WSProcesSa.DTO;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 
 namespace WSProcesSa.Controllers
 {
@@ -667,7 +666,6 @@ namespace WSProcesSa.Controllers
             }
         }
 
-
         [HttpPut]
         [Route("finishedTask/{idTask}")]
         public async Task<IActionResult> finishedTask(int idTask)
@@ -965,7 +963,7 @@ namespace WSProcesSa.Controllers
         [Route("getNotificarionTask")]
         public async Task<IActionResult> GetNotificarionTask()
         {
-            try 
+            try
             {
                 using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
                 {
@@ -985,6 +983,143 @@ namespace WSProcesSa.Controllers
                 {
                     Id = 1,
                     Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
+
+        // Agregar reporte problema
+        [HttpPut]
+        [Route("reportProblem/{id}")]
+
+        public async Task<IActionResult> reportProblem(int id, [FromBody] Tarea task)
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    List<Error> errors = new List<Error>();
+                    Tarea taskUpdated = db.Tareas.Where(f => f.IdTarea == id).FirstOrDefault();
+                    if (taskUpdated != null)
+                    {
+
+
+                        if (string.IsNullOrWhiteSpace(task.ReporteProblema))
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'DescripcionTarea'",
+                                Detail = "The Field 'DescripcionTarea' can´t be null or whitespace"
+                            });
+                        }
+                        else
+                        {
+                            taskUpdated.ReporteProblema = task.ReporteProblema;
+                        }
+
+
+                        db.SaveChanges();
+                        return Ok(new Response()
+                        {
+                            Data = new TareaDTO(taskUpdated),
+                            Errors = errors
+                        });
+
+                    }
+                    else
+                    {
+                        return NotFound(new Response()
+                        {
+                            Errors = new List<Error>()
+                            {
+                                new Error()
+                                {
+                                    Id = 1,
+                                    Status = "Not Found",
+                                    Code = 404,
+                                    Title = "No Data Found",
+                                    Detail = "Couldn´t find the Task"
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
+        [HttpGet]
+        [Route("getOverdureTask")]
+        public async Task<IActionResult> GetOverdureTask()
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    //Se Obtiene el listado de tareas con el estado de tareas Aceptado
+                    int response = db.Tareas.Where(t => t.FkEstadoTarea == 6).Count();
+                    return Ok(new Response() { Data = response });
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
+
+        [HttpPost]
+        [Route("listenToDelayedTask")]
+        public async Task<IActionResult> listenToDelayedTask()
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    // Se obtiene el listado de las tareas con su respectivas fechas de plazo
+                    List<Tarea> response = db.Tareas.Where(t => t.FechaPlazo < DateTime.Today).ToList();
+
+                    foreach (var i in response)
+                    {
+                        i.FkEstadoTarea = 6;
+                        db.SaveChanges();
+                    }
+                    return Ok(new Response() { Data = "Successful operation"});
+                }
+
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Inernal Server Error",
                     Code = 500,
                     Title = err.Message,
                     Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
