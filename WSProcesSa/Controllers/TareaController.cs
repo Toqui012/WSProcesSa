@@ -666,6 +666,84 @@ namespace WSProcesSa.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("finishedTask/{idTask}")]
+        public async Task<IActionResult> finishedTask(int idTask)
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    List<Error> errors = new List<Error>();
+                    //Tarea que yo quiero editar
+                    Tarea taskUpdated = db.Tareas.FirstOrDefault(t => t.IdTarea == idTask);
+
+                    if (taskUpdated != null)
+                    {
+                        if (idTask < 0)
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'IdTask'",
+                                Detail = "The Field 'FkPrioridadTarea' can't be less than 0"
+                            });
+                        }
+                        else
+                        {
+                            //Historial de Estado de tarea
+                            //1 = Creada
+                            //2 = Asignada
+                            //3 = Aceptada
+                            //4 = Rechazada
+                            //5 = Finalizada
+                            taskUpdated.FkEstadoTarea = 5;
+                            taskUpdated.PorcentajeAvance = 100;
+                        }
+                        db.SaveChanges();
+                        return Ok(new Response()
+                        {
+                            Data = new TareaDTO(taskUpdated),
+
+                            Errors = errors
+                        });
+                    }
+                    else
+                    {
+                        return NotFound(new Response()
+                        {
+                            Errors = new List<Error>()
+                            {
+                                new Error()
+                                {
+                                    Id = 1,
+                                    Status = "Not Found",
+                                    Code = 404,
+                                    Title = "No Data Found",
+                                    Detail = "Couldn´t find the Task"
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
+
 
         [HttpPut]
         [Route("rejectTask/{idTask}")]
@@ -881,7 +959,114 @@ namespace WSProcesSa.Controllers
                 return StatusCode(500, response);
             }
         }
+----------
+        [HttpGet]
+        [Route("getNotificarionTask")]
+        public async Task<IActionResult> GetNotificarionTask()
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
 
+                    //Se Obtiene el listado de tareas con fecha pronta a vencer en 5 dias.
+
+                    DateTime newTime = DateTime.Now.AddDays(5);
+                    List<Tarea> response = db.Tareas.Where(f => f.FechaPlazo <= newTime).ToList();
+
+                    return Ok(new Response() { Data = response });
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
+----------
+
+        // Agregar reporte problema
+        [HttpPut]
+        [Route("reportProblem/{id}")]
+
+        public async Task<IActionResult> reportProblem(int id, [FromBody] Tarea task)
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    List<Error> errors = new List<Error>();
+                    Tarea taskUpdated = db.Tareas.Where(f => f.IdTarea == id).FirstOrDefault();
+                    if (taskUpdated != null)
+                    {
+
+
+                        if (string.IsNullOrWhiteSpace(task.ReporteProblema))
+                        {
+                            errors.Add(new Error()
+                            {
+                                Id = errors.Count + 1,
+                                Status = "Bad Request",
+                                Code = 400,
+                                Title = "Invalid Field 'DescripcionTarea'",
+                                Detail = "The Field 'DescripcionTarea' can´t be null or whitespace"
+                            });
+                        }
+                        else
+                        {
+                            taskUpdated.ReporteProblema = task.ReporteProblema;
+                        }
+
+
+                        db.SaveChanges();
+                        return Ok(new Response()
+                        {
+                            Data = new TareaDTO(taskUpdated),
+                            Errors = errors
+                        });
+
+                    }
+                    else
+                    {
+                        return NotFound(new Response()
+                        {
+                            Errors = new List<Error>()
+                            {
+                                new Error()
+                                {
+                                    Id = 1,
+                                    Status = "Not Found",
+                                    Code = 404,
+                                    Title = "No Data Found",
+                                    Detail = "Couldn´t find the Task"
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
         [HttpGet]
         [Route("getOverdureTask")]
         public async Task<IActionResult> GetOverdureTask()
