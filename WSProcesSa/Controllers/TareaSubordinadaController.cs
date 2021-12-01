@@ -449,9 +449,7 @@ namespace WSProcesSa.Controllers
                                     where empresa.RutEmpresa == fkRutEmpresa
                                     select new
                                     {
-                                        TareaSubordinada = tareaSubordinada.IdTareaSubordinada,
-                                        tareaSubordinada.NombreSubordinada,
-                                        tareaSubordinada.DescripcionSubordinada
+                                        tareaSubordinada
 
                                     }).ToList();
 

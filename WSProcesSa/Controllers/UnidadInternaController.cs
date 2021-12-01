@@ -394,10 +394,7 @@ namespace WSProcesSa.Controllers
                     var response = (from unidadInterna in db.UnidadInternas
                                     join empresa in db.Empresas on unidadInterna.FkRutEmpresa equals empresa.RutEmpresa
                                     where unidadInterna.FkRutEmpresa == fkRutEmpresa
-                                    select new { Unite = unidadInterna.IdUnidadInterna,
-                                                         unidadInterna. NombreUnidad,
-                                                         unidadInterna.DescripcionUnidad,
-                                                         unidadInterna.FkRutEmpresa}).ToList();
+                                    select new {unidadInterna}).ToList();
 
 
                     if (response != null)
