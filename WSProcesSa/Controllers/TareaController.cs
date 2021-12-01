@@ -946,7 +946,7 @@ namespace WSProcesSa.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("getTaskByBusiness/{idUnidadInterna}")]
         public async Task<IActionResult> getTaskByBusiness(int idUnidadInterna)
         {
@@ -962,7 +962,8 @@ namespace WSProcesSa.Controllers
                                            where unite.IdUnidadInterna == idUnidadInterna
                                            select new { Tarea = task.NombreTarea, task.DescripcionTarea,
                                                                 task.FkRutUsuario, task.FkEstadoTarea,
-                                                                task.CreadaPor, task.PorcentajeAvance}).ToList();
+                                                                task.CreadaPor, task.PorcentajeAvance,
+                                                                task.FechaPlazo, task.IdTarea}).ToList();
 
                     var json = JsonConvert.SerializeObject(response.ToArray());
                     List<TareaDTO> listadoTarea = new List<TareaDTO>();
@@ -1011,7 +1012,7 @@ namespace WSProcesSa.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("getUserByBusiness/{idUnidadInterna}")]
         public async Task<IActionResult> getUserByBusiness(int idUnidadInterna)
         {
