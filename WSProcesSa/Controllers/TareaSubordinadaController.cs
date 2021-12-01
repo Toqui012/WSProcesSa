@@ -429,5 +429,71 @@ namespace WSProcesSa.Controllers
                 return StatusCode(500, response);
             }
         }
+
+
+        [HttpGet]
+        [Route("getTareaSubordinadaByBusiness/{fkRutEmpresa}")]
+        public async Task<IActionResult> getTareaSubordinadaByBusiness(string fkRutEmpresa)
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+
+                    // Se obtiene el listado con filtro de tareas subordinadas interna por empresa 
+                    var response = (from tareaSubordinada in db.TareaSubordinada
+                                    join tarea in db.Tareas on tareaSubordinada.FkIdTarea equals tarea.IdTarea
+                                    join usuario in db.Usuarios on tarea.FkRutUsuario equals usuario.RutUsuario
+                                    join unidadInterna in db.UnidadInternas on usuario.IdUnidadInternaUsuario equals unidadInterna.IdUnidadInterna
+                                    join empresa in db.Empresas on unidadInterna.FkRutEmpresa equals empresa.RutEmpresa
+                                    where empresa.RutEmpresa == fkRutEmpresa
+                                    select new
+                                    {
+                                        tareaSubordinada
+
+                                    }).ToList();
+
+
+                    if (response != null)
+                    {
+                        return Ok(new Response() { Data = response });
+                    }
+                    else
+                    {
+                        return NotFound(new Response()
+                        {
+                            Errors = new List<Error>()
+                            {
+                                new Error()
+                                {
+                                    Id = 1,
+                                    Status = "Not Found",
+                                    Code = 404,
+                                    Title = "No Data Found",
+                                    Detail = "Couldn´t find the User in this Business"
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
+
+
     }
+
+
 }
