@@ -75,6 +75,56 @@ namespace WSProcesSa.Controllers
             }
         }
 
+        //Get One UnidadInterna
+        [HttpGet]
+        [Route("oneUnidadInterna/{idUnidadInterna}")]
+        public async Task<IActionResult> GetOneUnidadInterna(decimal idUnidadInterna)
+        {
+            using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+            {
+                try
+                {
+                    List<Error> errors = new List<Error>();
+                    List<UnidadInterna> response = db.UnidadInternas.Where(u => u.IdUnidadInterna == idUnidadInterna).ToList();
+                    if (response.Count == 0)
+                    {
+                        return NotFound(new Response()
+                        {
+                            Data = response,
+                            Errors = new List<Error>()
+                            {
+                                new Error()
+                                {
+                                    Id = 1,
+                                    Status = "Not Found",
+                                    Code = 404 ,
+                                    Title = "No Data Found",
+                                    Detail = "There is no data on database"
+                                }
+                            }
+                        });
+                    }
+                    else
+                    {
+                        return Ok(new Response() { Data = response });
+                    }
+                }
+                catch (Exception err)
+                {
+                    Response response = new Response();
+                    response.Errors.Add(new Error()
+                    {
+                        Id = 1,
+                        Status = "Internal Server Error",
+                        Code = 500,
+                        Title = err.Message,
+                        Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                    });
+                    return StatusCode(500, response);
+                }
+            }
+        }
+
         [HttpPost]
         [Route("add")]
         public async Task<IActionResult> AddUnidadInterna([FromBody] UnidadInterna newUnidadInternaToAdd)
@@ -330,5 +380,66 @@ namespace WSProcesSa.Controllers
                 return StatusCode(500, response);
             }
         }
+
+        [HttpGet]
+        [Route("getUnidadInternaByBusiness/{fkRutEmpresa}")]
+        public async Task<IActionResult> getUnitByBusiness(string fkRutEmpresa)
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+
+                    // Se obtiene el listado con filtro de unidad interna por empresa 
+                    var response = (from unidadInterna in db.UnidadInternas
+                                    join empresa in db.Empresas on unidadInterna.FkRutEmpresa equals empresa.RutEmpresa
+                                    where unidadInterna.FkRutEmpresa == fkRutEmpresa
+                                    select new { Unite = unidadInterna.IdUnidadInterna,
+                                                         unidadInterna. NombreUnidad,
+                                                         unidadInterna.DescripcionUnidad,
+                                                         unidadInterna.FkRutEmpresa}).ToList();
+
+
+                    if (response != null)
+                    {
+                        return Ok(new Response() { Data = response });
+                    }
+                    else
+                    {
+                        return NotFound(new Response()
+                        {
+                            Errors = new List<Error>()
+                            {
+                                new Error()
+                                {
+                                    Id = 1,
+                                    Status = "Not Found",
+                                    Code = 404,
+                                    Title = "No Data Found",
+                                    Detail = "Couldn´t find the User in this Business"
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
+
+
     }
 }
+
+

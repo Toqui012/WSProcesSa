@@ -1021,7 +1021,7 @@ namespace WSProcesSa.Controllers
                 using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
                 {
 
-                    // Se obtiene el listado con filtro de tareas por empresa 
+                    // Se obtiene el listado con filtro de usuarios por empresa 
                     var response = (from user in db.Usuarios
                                     join unite in db.UnidadInternas on user.IdUnidadInternaUsuario equals unite.IdUnidadInterna
                                     where unite.IdUnidadInterna == idUnidadInterna
