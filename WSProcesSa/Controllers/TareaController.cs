@@ -29,7 +29,7 @@ namespace WSProcesSa.Controllers
             this.hostEnvironment = hostEnvironment;
         }
 
-        [HttpGet]
+        [HttpGet] 
         public async Task<IActionResult> GetTask()
         {
             try
