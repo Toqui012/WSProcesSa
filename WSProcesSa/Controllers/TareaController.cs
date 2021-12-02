@@ -1279,7 +1279,59 @@ namespace WSProcesSa.Controllers
                 return StatusCode(500, response);
             }
         }
+        [HttpGet]
+        [Route("getUserByBusiness/{idUnidadInterna}")]
+        public async Task<IActionResult> getUserByBusiness(int idUnidadInterna)
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
 
+                    // Se obtiene el listado con filtro de tareas por empresa 
+                    var response = (from user in db.Usuarios
+                                    join unite in db.UnidadInternas on user.IdUnidadInternaUsuario equals unite.IdUnidadInterna
+                                    where unite.IdUnidadInterna == idUnidadInterna
+                                    select new {user}).ToList();
+
+
+                    if (response != null)
+                    {
+                        return Ok(new Response() { Data = response });
+                    }
+                    else
+                    {
+                        return NotFound(new Response()
+                        {
+                            Errors = new List<Error>()
+                            {
+                                new Error()
+                                {
+                                    Id = 1,
+                                    Status = "Not Found",
+                                    Code = 404,
+                                    Title = "No Data Found",
+                                    Detail = "Couldn´t find the User in this Business"
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
 
         
 
