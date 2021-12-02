@@ -11,6 +11,7 @@ using WSProcesSa.Controllers;
 using WSProcesSa.Models;
 using WSProcesSa.DTO;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
 
 namespace WSProcesSa.Controllers
 {
@@ -1333,9 +1334,34 @@ namespace WSProcesSa.Controllers
             }
         }
 
-        
 
-
+        [HttpGet]
+        [Route("getFinishTaskWithProblem")]
+        public async Task<IActionResult> GetFinishTaskWithProblem()
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+                    //Se Obtiene el listado de tareas con el estado de tarea finalizado pero con problemas
+                    int response = db.Tareas.Where(t => t.FkEstadoTarea == 5 && t.ReporteProblema != null).Count();
+                    return Ok(new Response() { Data = response });
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
 
     }
 }
