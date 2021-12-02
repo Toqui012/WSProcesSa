@@ -76,6 +76,92 @@ namespace WSProcesSa.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("taskProgress/{idTarea}")]
+        public async Task<IActionResult> ProgressTask(int idTarea, [FromBody] int cantHoras)
+		{
+            using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+			{
+				try
+				{
+                    List<Error> errors = new List<Error>();
+                    Tarea response = db.Tareas.Where(u => u.IdTarea == idTarea).FirstOrDefault();
+
+                    if (response == null)
+                    {
+                        return NotFound(new Response()
+                        {
+                            Data = response,
+                            Errors = new List<Error>()
+                            {
+                                new Error()
+                                {
+                                    Id = 1,
+                                    Status = "Not Found",
+                                    Code = 404 ,
+                                    Title = "No Data Found",
+                                    Detail = "There is no data on database"
+                                }
+                            }
+                        });
+                    }
+                    else
+					{
+
+                        DateTime desde = response.FechaCreacion;
+                        DateTime hasta = response.FechaPlazo;
+
+                        DateTime inicio = desde;
+                        int dias = 0;
+
+                        while(inicio <= hasta)
+						{
+                            if (inicio.DayOfWeek != DayOfWeek.Saturday && inicio.DayOfWeek != DayOfWeek.Sunday)
+                                dias++;
+
+                            inicio = inicio.AddDays(1);
+						}
+
+                        var totalTiempo = dias * 9;
+
+
+                        // Horas que lleva la tarea avanzada
+                        var reglaTres = (totalTiempo * response.PorcentajeAvance / 100);
+
+                        //
+                        reglaTres = reglaTres + cantHoras;
+
+                        // Porcentaje nuevo de la tarea redondeado
+                        var reglaTres2 = Math.Round((reglaTres * 100) / totalTiempo);
+
+                        // Añadimos a bd
+                        response.PorcentajeAvance = reglaTres2;
+
+                        // Guardamos cambios
+                        db.SaveChanges();
+
+                        return Ok(new Response() { Data = response });
+
+                    }
+
+                }
+
+                catch(Exception err)
+				{
+                    Response response = new Response();
+                    response.Errors.Add(new Error()
+                    {
+                        Id = 1,
+                        Status = "Internal Server Error",
+                        Code = 500,
+                        Title = err.Message,
+                        Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                    });
+                    return StatusCode(500, response);
+                }
+			}
+		}
+
         [HttpGet]
         [Route("oneTask/{idTarea}")]
         public async Task<IActionResult> GetOneTask(int idTarea)
