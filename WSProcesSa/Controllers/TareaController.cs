@@ -435,7 +435,7 @@ namespace WSProcesSa.Controllers
                                 Status = "Bad Request",
                                 Code = 400,
                                 Title = "Invalid Field 'RutUsuario'",
-                                Detail = "The Field 'RutUsuarop' can't be null or white space"
+                                Detail = "The Field 'RutUsuario' can't be null or white space"
                             });
                         }
                         else
@@ -959,7 +959,6 @@ namespace WSProcesSa.Controllers
                 return StatusCode(500, response);
             }
         }
-----------
         [HttpGet]
         [Route("getNotificarionTask")]
         public async Task<IActionResult> GetNotificarionTask()
@@ -991,7 +990,6 @@ namespace WSProcesSa.Controllers
                 return StatusCode(500, response);
             }
         }
-----------
 
         // Agregar reporte problema
         [HttpPut]
@@ -1129,5 +1127,77 @@ namespace WSProcesSa.Controllers
                 return StatusCode(500, response);
             }
         }
+		
+		[HttpGet]
+        [Route("getTaskByBusiness/{idUnidadInterna}")]
+        public async Task<IActionResult> getTaskByBusiness(int idUnidadInterna)
+        {
+            try
+            {
+                using (ModelContext db = new ModelContext(config.GetConnectionString("Acceso")))
+                {
+
+                    // Se obtiene el listado con filtro de tareas por empresa 
+                    var response = (from task in db.Tareas
+                                           join user in db.Usuarios on task.FkRutUsuario equals user.RutUsuario
+                                           join unite in db.UnidadInternas on user.IdUnidadInternaUsuario equals unite.IdUnidadInterna
+                                           where unite.IdUnidadInterna == idUnidadInterna
+                                           select new { Tarea = task.NombreTarea, task.DescripcionTarea,
+                                                                task.FkRutUsuario, task.FkEstadoTarea,
+                                                                task.CreadaPor, task.PorcentajeAvance,
+                                                                task.FechaPlazo, task.IdTarea}).ToList();
+
+                    var json = JsonConvert.SerializeObject(response.ToArray());
+                    List<TareaDTO> listadoTarea = new List<TareaDTO>();
+
+                    foreach (var i in response)
+                    {
+                        Console.Write(i);
+                    }
+
+
+                    if (response != null)
+                    {
+                        return Ok(new Response() { Data = response });
+                    }
+                    else
+                    {
+                        return NotFound(new Response()
+                        {
+                            Errors = new List<Error>()
+                            {
+                                new Error()
+                                {
+                                    Id = 1,
+                                    Status = "Not Found",
+                                    Code = 404,
+                                    Title = "No Data Found",
+                                    Detail = "Couldn´t find the Task in this Business"
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                Response response = new Response();
+                response.Errors.Add(new Error()
+                {
+                    Id = 1,
+                    Status = "Internal Server Error",
+                    Code = 500,
+                    Title = err.Message,
+                    Detail = err.InnerException != null ? err.InnerException.ToString() : err.Message
+                });
+                return StatusCode(500, response);
+            }
+        }
+
+
+        
+
+
+
     }
 }
